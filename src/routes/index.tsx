@@ -16,6 +16,7 @@ import { Debugger } from '../pages/dashboard/Debugger';
 import { CodeAnalyzer } from '../pages/dashboard/CodeAnalyzer';
 import { Activity } from '../pages/dashboard/Activity';
 import { Settings } from '../pages/dashboard/Settings';
+import { GitHubCallback } from '../pages/dashboard/GitHubCallback';
 
 export const router = createBrowserRouter([
   {
@@ -45,4 +46,8 @@ export const router = createBrowserRouter([
       { path: 'settings', element: <Settings /> },
     ],
   },
+  {
+    path: '/github/callback',
+    element: <GitHubCallback />
+  }
 ]);

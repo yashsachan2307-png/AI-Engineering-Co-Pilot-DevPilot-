@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: devpilot-backend
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:h2:mem:devpilot;DB_CLOSE_DELAY=-1}
+    username: ${DATABASE_USERNAME:sa}
+    password: ${DATABASE_PASSWORD:}
+    driver-class-name: ${DATABASE_DRIVER:org.h2.Driver}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: ${DATABASE_DIALECT:org.hibernate.dialect.H2Dialect}
+        format_sql: true
+    show-sql: true
+
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+
+devpilot:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:8f75b7b620023023ebc9c3e2e0fb5219597c2763260840b15b31f750b38ef0fae929f0ef7491b8a5316dbb44f24df926c4f74d0e82c5f1345ff5b3f115a97576}
+      expirationMs: 86400000
+  ai:
+    api-key: ${AI_API_KEY:}
+  github:
+    client-id: ${GITHUB_CLIENT_ID:}
+    client-secret: ${GITHUB_CLIENT_SECRET:}
+    redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:5173/github/callback}
+  encryption:
+    secret-key: ${ENCRYPTION_KEY:12345678901234567890123456789012} # Must be exactly 32 bytes for AES-256
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
