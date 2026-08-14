@@ -34,7 +34,7 @@ export function AIAssistant() {
   const [repositories, setRepositories] = useState<Repo[]>([]);
   const [selectedRepoId, setSelectedRepoId] = useState<number | null>(null);
   
-  const [conversations, setConversations] = useState<AIConversation[]>([]);
+  const [, setConversations] = useState<AIConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
   const [messages, setMessages] = useState<AIMessage[]>([]);
   
