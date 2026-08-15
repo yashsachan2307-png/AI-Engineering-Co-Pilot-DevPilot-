@@ -1,0 +1,47 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
+import { Login } from './Login';
+import { describe, it, expect, vi } from 'vitest';
+import * as api from '../../lib/api'; // Assuming you have api calls here or fetch is used directly
+
+// Mock useAuth
+vi.mock('../../hooks/useAuth', () => ({
+  useAuth: () => ({
+    login: vi.fn(),
+    user: null,
+    isAuthenticated: false,
+    loading: false
+  })
+}));
+
+describe('Login Component', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('renders login form correctly', () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByPlaceholderText(/you@example.com/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/••••••••/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Log In/i })).toBeInTheDocument();
+  });
+
+  it('handles validation errors', async () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    const submitBtn = screen.getByRole('button', { name: /Log In/i });
+    fireEvent.click(submitBtn);
+
+    // Ideally shows validation messages, if handled in the UI
+  });
+});
