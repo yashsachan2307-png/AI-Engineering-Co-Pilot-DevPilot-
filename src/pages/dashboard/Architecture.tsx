@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { ArchitectureAnalysis, GraphNode as ApiNode, GraphEdge as ApiEdge, getArchitecture, explainArchitecture } from '../../services/architectureService';
+import { ArchitectureAnalysis, GraphNode as ApiNode, getArchitecture, explainArchitecture } from '../../services/architectureService';
 import { ReactFlow, Controls, Background, Node, Edge, MarkerType } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
