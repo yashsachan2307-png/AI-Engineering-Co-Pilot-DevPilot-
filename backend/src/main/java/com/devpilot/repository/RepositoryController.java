@@ -108,8 +108,7 @@ public class RepositoryController {
         }
         
         // Exclude content for the tree list
-        List<RepositoryFile> files = repositoryFileRepository.findByRepositoryId(id);
-        files.forEach(f -> f.setContent(null)); // Don't send contents in tree view
+        List<RepositoryFileSummary> files = repositoryFileRepository.findSummariesByRepositoryId(id);
         
         return ResponseEntity.ok(files);
     }

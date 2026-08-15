@@ -7,7 +7,9 @@ import {
   Bug,
   Activity,
   Settings,
-  TerminalSquare
+  TerminalSquare,
+  Network,
+  ShieldAlert
 } from 'lucide-react';
 import { Avatar } from '../components/ui/Avatar';
 
@@ -18,6 +20,8 @@ const navItems = [
   { icon: Code2, label: 'Code Generator', to: '/dashboard/code-generator' },
   { icon: Bug, label: 'Debugger', to: '/dashboard/debugger' },
   { icon: TerminalSquare, label: 'Code Analyzer', to: '/dashboard/code-analyzer' },
+  { icon: Network, label: 'Architecture', to: '/dashboard/architecture' },
+  { icon: ShieldAlert, label: 'Security', to: '/dashboard/security' },
   { icon: Activity, label: 'Activity', to: '/dashboard/activity' },
 ];
 

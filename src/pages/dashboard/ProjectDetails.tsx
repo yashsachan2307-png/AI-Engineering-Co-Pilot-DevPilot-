@@ -6,12 +6,13 @@ import { CodeViewer } from './components/CodeViewer';
 
 import { CodeIntelligenceDashboard } from './components/CodeIntelligenceDashboard';
 import { CodeQualityDashboard } from './components/CodeQualityDashboard';
+import { CodeReviewPage } from './reviews/CodeReviewPage';
 
 export function ProjectDetails() {
   const { id } = useParams();
   const { token } = useAuth();
   
-  const [activeTab, setActiveTab] = useState<'FILES' | 'INTELLIGENCE' | 'QUALITY'>('FILES');
+  const [activeTab, setActiveTab] = useState<'FILES' | 'INTELLIGENCE' | 'QUALITY' | 'REVIEW'>('FILES');
   const [status, setStatus] = useState<string>('NONE');
   const [files, setFiles] = useState<RepositoryFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<RepositoryFile | null>(null);
@@ -136,6 +137,9 @@ export function ProjectDetails() {
           <div style={tabStyle(activeTab === 'QUALITY')} onClick={() => setActiveTab('QUALITY')}>
             Code Quality
           </div>
+          <div style={tabStyle(activeTab === 'REVIEW')} onClick={() => setActiveTab('REVIEW')}>
+            AI Code Review
+          </div>
         </div>
       )}
       
@@ -181,6 +185,12 @@ export function ProjectDetails() {
 
       {status === 'COMPLETED' && activeTab === 'QUALITY' && (
         <CodeQualityDashboard repositoryId={id || ''} />
+      )}
+
+      {status === 'COMPLETED' && activeTab === 'REVIEW' && (
+        <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#f9fafb' }}>
+          <CodeReviewPage />
+        </div>
       )}
       
       {status !== 'COMPLETED' && status !== 'NONE' && (

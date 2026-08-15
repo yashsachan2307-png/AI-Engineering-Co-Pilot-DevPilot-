@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -53,14 +54,20 @@ public class AnalysisController {
     @PostMapping("/analyze")
     public ResponseEntity<?> startAnalysis(
             @PathVariable Long repositoryId,
+            @RequestParam(required = false) String commitSha,
             @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = Long.parseLong(userDetails.getUsername());
         try {
-            AnalysisJob job = analysisService.startAnalysis(repositoryId, userId);
+            AnalysisJob job = analysisService.startAnalysis(repositoryId, userId, commitSha);
             return ResponseEntity.ok(job);
         } catch (RuntimeException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
+    }
+
+    @GetMapping("/analyze/progress/{jobId}")
+    public SseEmitter getProgress(@PathVariable Long repositoryId, @PathVariable Long jobId) {
+        return analysisService.getSseService().subscribe(jobId);
     }
 
     @GetMapping("/analysis")

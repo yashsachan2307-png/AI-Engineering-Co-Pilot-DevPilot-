@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
+import { useAnalysisProgress } from '../../../hooks/useAnalysisProgress';
 
 interface CodeSymbol {
   id: number;
@@ -29,13 +30,28 @@ export function CodeIntelligenceDashboard({ repositoryId }: CodeIntelligenceDash
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [symbols, setSymbols] = useState<CodeSymbol[]>([]);
   const [filterType, setFilterType] = useState<string>('');
+  const [jobId, setJobId] = useState<number | undefined>();
   
+  const { progress } = useAnalysisProgress(jobId ? parseInt(repositoryId) : undefined, jobId);
+
   useEffect(() => {
     fetchStatus();
     const interval = setInterval(fetchStatus, 3000);
     return () => clearInterval(interval);
   }, [repositoryId, token]);
   
+  useEffect(() => {
+    if (progress) {
+      if (progress.status === 'COMPLETED' && status !== 'COMPLETED') {
+        setStatus('COMPLETED');
+        fetchMetrics();
+        fetchSymbols();
+      } else if (progress.status === 'FAILED') {
+        setStatus('FAILED');
+      }
+    }
+  }, [progress]);
+
   const fetchStatus = async () => {
     if (!token) return;
     try {
@@ -45,6 +61,7 @@ export function CodeIntelligenceDashboard({ repositoryId }: CodeIntelligenceDash
       const data = await res.json();
       if (data.status) {
         setStatus(data.status);
+        if (data.id) setJobId(data.id);
         if (data.status === 'COMPLETED' && !metrics) {
           fetchMetrics();
           fetchSymbols();
@@ -94,7 +111,9 @@ export function CodeIntelligenceDashboard({ repositoryId }: CodeIntelligenceDash
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
+        const data = await res.json();
         setStatus('QUEUED');
+        setJobId(data.id);
       }
     } catch (err) {
       console.error(err);
@@ -123,7 +142,24 @@ export function CodeIntelligenceDashboard({ repositoryId }: CodeIntelligenceDash
     return (
       <div style={{ padding: '40px', textAlign: 'center', backgroundColor: 'var(--color-surface)', borderRadius: '8px' }}>
         <h2 style={{ marginBottom: '16px' }}>Analyzing Repository...</h2>
-        <p style={{ color: 'var(--color-text-secondary)' }}>Parsing AST structures and generating metrics. This may take a moment.</p>
+        <p style={{ color: 'var(--color-text-secondary)', marginBottom: '20px' }}>Parsing AST structures and generating metrics. This may take a moment.</p>
+        
+        {progress && (
+          <div style={{ marginTop: '20px', maxWidth: '400px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
+              <span>{progress.step}</span>
+              <span>{progress.percentage}%</span>
+            </div>
+            <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--color-border)', borderRadius: '4px', overflow: 'hidden' }}>
+              <div style={{ 
+                width: `${progress.percentage}%`, 
+                height: '100%', 
+                backgroundColor: 'var(--color-primary)',
+                transition: 'width 0.3s ease-in-out'
+              }} />
+            </div>
+          </div>
+        )}
       </div>
     );
   }

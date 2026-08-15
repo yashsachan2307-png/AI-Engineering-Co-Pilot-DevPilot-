@@ -23,6 +23,15 @@ public class AnalysisJob {
     @Column
     private String type = "SYMBOL_EXTRACTION"; // SYMBOL_EXTRACTION or STATIC_ANALYSIS
 
+    @Column
+    private String currentStep;
+
+    @Column
+    private Integer progressPercentage = 0;
+
+    @Column
+    private String commitSha;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime startedAt = LocalDateTime.now();
 
@@ -48,4 +57,13 @@ public class AnalysisJob {
 
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
+
+    public String getCurrentStep() { return currentStep; }
+    public void setCurrentStep(String currentStep) { this.currentStep = currentStep; }
+
+    public Integer getProgressPercentage() { return progressPercentage; }
+    public void setProgressPercentage(Integer progressPercentage) { this.progressPercentage = progressPercentage; }
+
+    public String getCommitSha() { return commitSha; }
+    public void setCommitSha(String commitSha) { this.commitSha = commitSha; }
 }

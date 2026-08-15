@@ -3,7 +3,9 @@ package com.devpilot.analysis;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "code_symbols")
+@Table(name = "code_symbols", indexes = {
+    @Index(name = "idx_code_symbol_repo_id", columnList = "repositoryId")
+})
 public class CodeSymbol {
 
     @Id

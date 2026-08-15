@@ -3,7 +3,9 @@ package com.devpilot.repository;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "repository_files")
+@Table(name = "repository_files", indexes = {
+    @Index(name = "idx_repo_file_repo_id", columnList = "repositoryId")
+})
 public class RepositoryFile {
 
     @Id
