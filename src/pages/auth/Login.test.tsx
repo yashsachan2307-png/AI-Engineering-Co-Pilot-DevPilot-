@@ -1,10 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import userEvent from '@testing-library/user-event';
 import { Login } from './Login';
-import { describe, it, expect, vi } from 'vitest';
-import * as api from '../../lib/api'; // Assuming you have api calls here or fetch is used directly
-
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Mock useAuth
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
