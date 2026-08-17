@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Terminal, ShieldAlert, Cpu, Bot, Github } from 'lucide-react';
+import { Terminal, ShieldAlert, Cpu, Bot, Cloud } from 'lucide-react';
 
 export function Landing() {
   return (
@@ -35,7 +35,7 @@ export function Landing() {
 
         <div style={{ display: 'flex', gap: '16px', marginBottom: '64px' }}>
           <Link to="/signup" className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '14px', gap: '8px' }}>
-            <Github size={16} />
+            <Cloud size={16} />
             Connect GitHub
           </Link>
           <Link to="/login" className="btn btn-secondary" style={{ padding: '12px 24px', fontSize: '14px' }}>
