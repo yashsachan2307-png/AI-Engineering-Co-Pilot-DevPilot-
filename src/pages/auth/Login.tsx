@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
 import { Terminal } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import '../../styles/landing.css';
 
 export function Login() {
   const { login } = useAuth();
@@ -23,22 +21,24 @@ export function Login() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
-          <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: 'inherit' }}>
-            <Terminal size={24} style={{ color: 'var(--color-accent)' }} />
-            <span style={{ fontWeight: 700, fontSize: '1.25rem' }}>DevPilot</span>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-bg">
+      <div className="panel bg-surface w-full max-w-md p-8">
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex items-center gap-2 mb-6 text-primary hover:text-accent transition-colors">
+            <Terminal size={28} className="text-accent" />
+            <span className="font-bold text-xl tracking-tight">DevPilot</span>
           </Link>
-          <h1 className="auth-title">Welcome back</h1>
-          <p className="auth-subtitle">Log in to your account to continue</p>
+          <h1 className="text-2xl font-bold text-primary mb-2">Welcome back</h1>
+          <p className="text-sm text-secondary">Log in to your account to continue</p>
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {error && <div style={{ color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '0.75rem', borderRadius: '0.375rem', marginBottom: '1rem', fontSize: '0.875rem' }}>{error}</div>}
-          <div className="auth-form-group">
-            <label className="auth-form-label" htmlFor="email">Email</label>
-            <Input 
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+          {error && <div className="text-error bg-error/10 border border-error/20 p-3 rounded-md text-sm">{error}</div>}
+          
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-primary" htmlFor="email">Email</label>
+            <input 
+              className="input w-full"
               id="email" 
               type="email" 
               placeholder="you@example.com" 
@@ -48,9 +48,10 @@ export function Login() {
             />
           </div>
           
-          <div className="auth-form-group">
-            <label className="auth-form-label" htmlFor="password">Password</label>
-            <Input 
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-primary" htmlFor="password">Password</label>
+            <input 
+              className="input w-full"
               id="password" 
               type="password" 
               placeholder="••••••••" 
@@ -60,27 +61,29 @@ export function Login() {
             />
           </div>
 
-          <div className="auth-options">
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-              <input type="checkbox" style={{ accentColor: 'var(--color-accent)' }} />
-              <span>Remember me</span>
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" className="rounded border-border bg-[#0f172a] text-accent focus:ring-accent focus:ring-offset-bg cursor-pointer" />
+              <span className="text-secondary group-hover:text-primary transition-colors">Remember me</span>
             </label>
-            <Link to="/forgot-password" className="auth-link">Forgot password?</Link>
+            <Link to="/forgot-password" className="text-accent hover:underline">Forgot password?</Link>
           </div>
 
-          <Button type="submit" variant="primary" className="w-full">Log In</Button>
+          <Button type="submit" className="btn-primary w-full mt-2">Log In</Button>
         </form>
 
-        <div className="auth-divider">or continue with</div>
+        <div className="flex items-center text-center my-6 text-secondary text-sm before:content-[''] before:flex-1 before:border-b before:border-border before:mr-4 after:content-[''] after:flex-1 after:border-b after:border-border after:ml-4">
+          or continue with
+        </div>
 
-        <div className="auth-social">
-          <Button variant="secondary" className="w-full gap-2" type="button">
-            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+        <div className="flex flex-col gap-3">
+          <Button className="btn-secondary w-full gap-2 justify-center" type="button">
+            <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
               <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/>
             </svg> GitHub
           </Button>
-          <Button variant="secondary" className="w-full gap-2" type="button">
-            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+          <Button className="btn-secondary w-full gap-2 justify-center" type="button">
+            <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -90,8 +93,8 @@ export function Login() {
           </Button>
         </div>
 
-        <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-          Don't have an account? <Link to="/signup" className="auth-link" style={{ fontWeight: 500 }}>Sign up</Link>
+        <p className="text-center mt-8 text-sm text-secondary">
+          Don't have an account? <Link to="/signup" className="text-accent font-medium hover:underline">Sign up</Link>
         </p>
       </div>
     </div>

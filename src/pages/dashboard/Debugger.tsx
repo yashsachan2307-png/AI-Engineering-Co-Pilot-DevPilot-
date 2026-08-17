@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { debuggerService, DebugRequest, DebugResponse } from '../../services/debuggerService';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { 
   FolderGit2, 
@@ -78,35 +77,28 @@ export function Debugger() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingBottom: '2rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+    <div className="flex flex-col gap-4 h-full bg-bg overflow-hidden">
+      <div className="panel border-b-0 border-l-0 border-r-0 rounded-none flex justify-between items-center px-4 py-3 shrink-0 bg-surface">
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Bug size={24} style={{ color: 'var(--color-accent)' }} />
+          <h1 className="text-sm font-semibold text-primary flex items-center gap-2 m-0">
+            <Bug size={16} className="text-accent" />
             Repository-Aware AI Debugger
           </h1>
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
+          <p className="text-xs text-secondary mt-1 m-0">
             Paste your stack trace and let AI diagnose the root cause using repository context.
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--color-bg-secondary)', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
-          <FolderGit2 size={16} style={{ color: 'var(--color-text-secondary)' }} />
+        <div className="flex items-center gap-2 px-3 py-1 bg-surface-hover border border-border rounded-sm">
+          <FolderGit2 size={14} className="text-muted" />
           <select
             value={selectedRepoId || ''}
             onChange={(e) => setSelectedRepoId(Number(e.target.value))}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--color-text)',
-              fontWeight: 600,
-              outline: 'none',
-              cursor: 'pointer'
-            }}
+            className="select text-xs py-0.5 border-none bg-transparent pl-0 focus:ring-0 w-48"
           >
             {repositories.length === 0 && <option value="">No repositories imported</option>}
             {repositories.map(r => (
-              <option key={r.id} value={r.id} style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
+              <option key={r.id} value={r.id} className="bg-surface text-primary">
                 {r.fullName || r.name}
               </option>
             ))}
@@ -114,181 +106,168 @@ export function Debugger() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', alignItems: 'start' }}>
+      <div className="flex flex-1 gap-4 overflow-hidden">
         {/* Left Column: Inputs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Error Details</CardTitle>
-              <CardDescription>Provide the error message and stack trace to begin.</CardDescription>
-            </CardHeader>
-            <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>Error Message (Required)</label>
-                <input 
-                  type="text" 
-                  value={errorMessage}
-                  onChange={e => setErrorMessage(e.target.value)}
-                  placeholder="e.g. NullPointerException in UserService.java"
-                  style={{ width: '100%', padding: '0.625rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)' }}
-                />
-              </div>
+        <div className="panel w-1/2 flex flex-col shrink-0 bg-surface border-l-0 border-r border-t border-b-0 rounded-none">
+          <div className="px-4 py-3 border-b border-border bg-surface-hover">
+            <h2 className="text-sm font-semibold text-primary m-0">Error Details</h2>
+            <p className="text-xs text-secondary m-0 mt-0.5">Provide the error message and stack trace to begin.</p>
+          </div>
+          <div className="flex flex-col gap-4 p-4 overflow-y-auto">
+            
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Error Message (Required)</label>
+              <input 
+                type="text" 
+                value={errorMessage}
+                onChange={e => setErrorMessage(e.target.value)}
+                placeholder="e.g. NullPointerException in UserService.java"
+                className="input text-xs"
+              />
+            </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>Stack Trace</label>
-                <textarea 
-                  value={stackTrace}
-                  onChange={e => setStackTrace(e.target.value)}
-                  placeholder="Paste the full stack trace here..."
-                  rows={8}
-                  style={{ width: '100%', padding: '0.625rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', fontFamily: 'monospace', fontSize: '0.875rem' }}
-                />
-              </div>
+            <div className="flex flex-col gap-1.5 flex-1 min-h-[200px]">
+              <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Stack Trace</label>
+              <textarea 
+                value={stackTrace}
+                onChange={e => setStackTrace(e.target.value)}
+                placeholder="Paste the full stack trace here..."
+                className="input flex-1 font-mono text-[11px] resize-none whitespace-pre"
+              />
+            </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600 }}>Context or Steps to Reproduce (Optional)</label>
-                <textarea 
-                  value={userDescription}
-                  onChange={e => setUserDescription(e.target.value)}
-                  placeholder="What were you trying to do when this happened?"
-                  rows={3}
-                  style={{ width: '100%', padding: '0.625rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', fontSize: '0.875rem' }}
-                />
-              </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Context or Steps to Reproduce (Optional)</label>
+              <textarea 
+                value={userDescription}
+                onChange={e => setUserDescription(e.target.value)}
+                placeholder="What were you trying to do when this happened?"
+                rows={3}
+                className="input text-xs resize-none"
+              />
+            </div>
 
-              <Button 
-                variant="accent" 
-                onClick={handleAnalyze} 
-                disabled={!selectedRepoId || !errorMessage.trim() || isAnalyzing}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%' }}
-              >
-                {isAnalyzing ? (
-                  <><RefreshCw size={16} className="animate-spin" /> Analyzing Repository Context...</>
-                ) : (
-                  <><Bug size={16} /> Analyze Error</>
-                )}
-              </Button>
-
-              {error && (
-                <div style={{ padding: '0.75rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: 'var(--radius-md)', fontSize: '0.875rem' }}>
-                  {error}
-                </div>
+            <Button 
+              className="btn-primary w-full justify-center text-xs py-2 mt-2"
+              onClick={handleAnalyze} 
+              disabled={!selectedRepoId || !errorMessage.trim() || isAnalyzing}
+            >
+              {isAnalyzing ? (
+                <><RefreshCw size={14} className="animate-spin mr-2" /> Analyzing Repository Context...</>
+              ) : (
+                <><Bug size={14} className="mr-2" /> Analyze Error</>
               )}
-            </CardContent>
-          </Card>
+            </Button>
+
+            {error && (
+              <div className="p-3 bg-error/10 text-error border border-error/30 rounded text-xs mt-2">
+                {error}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Column: Results */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="flex-1 overflow-y-auto pr-4 pb-4">
           {!result && !isAnalyzing && (
-            <Card style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px', backgroundColor: 'var(--color-bg-secondary)', borderStyle: 'dashed' }}>
-              <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-                <Bug size={48} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />
-                <p>Submit an error to view the AI diagnosis here.</p>
-              </div>
-            </Card>
+            <div className="h-full flex flex-col items-center justify-center text-muted border border-dashed border-border rounded-lg bg-surface/50 min-h-[400px]">
+              <Bug size={48} className="opacity-30 mb-4" />
+              <p className="text-sm">Submit an error to view the AI diagnosis here.</p>
+            </div>
           )}
 
           {isAnalyzing && (
-            <Card style={{ height: '100%', minHeight: '400px' }}>
-              <CardContent style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
-                <RefreshCw size={32} className="animate-spin" style={{ color: 'var(--color-accent)' }} />
-                <p style={{ fontWeight: 600 }}>Gathering Context & Diagnosing...</p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', textAlign: 'center', maxWidth: '80%' }}>
-                  Searching codebase for related files, analyzing stack trace elements, and generating fix recommendations.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="h-full flex flex-col items-center justify-center min-h-[400px]">
+              <RefreshCw size={32} className="text-accent animate-spin mb-4" />
+              <p className="text-sm font-semibold text-primary">Gathering Context & Diagnosing...</p>
+              <p className="text-xs text-secondary text-center max-w-sm mt-2">
+                Searching codebase for related files, analyzing stack trace elements, and generating fix recommendations.
+              </p>
+            </div>
           )}
 
           {result && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <Card style={{ borderColor: 'var(--color-danger, #ef4444)' }}>
-                <CardHeader style={{ paddingBottom: '0.5rem' }}>
-                  <CardTitle style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-danger, #ef4444)' }}>
-                    <AlertTriangle size={18} /> Root Cause Diagnosis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{result.rootCause}</p>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>{result.evidence}</p>
-                </CardContent>
-              </Card>
+            <div className="flex flex-col gap-4">
+              <div className="panel border-l-4 border-error/70">
+                <div className="px-4 py-2.5 border-b border-border bg-error/5 flex items-center gap-2">
+                  <AlertTriangle size={14} className="text-error" />
+                  <h3 className="text-sm font-semibold text-error m-0">Root Cause Diagnosis</h3>
+                </div>
+                <div className="p-4 bg-surface">
+                  <p className="text-sm font-medium text-primary mb-2 leading-relaxed">{result.rootCause}</p>
+                  <p className="text-xs text-secondary leading-relaxed">{result.evidence}</p>
+                </div>
+              </div>
 
               {result.suggestedFix && (
-                <Card style={{ borderColor: 'var(--color-success, #10b981)' }}>
-                  <CardHeader style={{ paddingBottom: '0.5rem' }}>
-                    <CardTitle style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-success, #10b981)' }}>
-                      <CheckCircle2 size={18} /> Suggested Fix
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="prose prose-sm dark:prose-invert" style={{ fontSize: '0.875rem' }}>
-                      <SyntaxHighlighter language="markdown" style={vscDarkPlus} className="rounded-md text-sm">
+                <div className="panel border-l-4 border-success/70">
+                  <div className="px-4 py-2.5 border-b border-border bg-success/5 flex items-center gap-2">
+                    <CheckCircle2 size={14} className="text-success" />
+                    <h3 className="text-sm font-semibold text-success m-0">Suggested Fix</h3>
+                  </div>
+                  <div className="p-4 bg-surface">
+                    <div className="text-xs rounded overflow-hidden border border-border">
+                      <SyntaxHighlighter language="markdown" style={vscDarkPlus} customStyle={{ margin: 0, fontSize: '11px', padding: '12px' }}>
                         {result.suggestedFix}
                       </SyntaxHighlighter>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
 
               {result.relevantFiles && result.relevantFiles.length > 0 && (
-                <Card>
-                  <CardHeader style={{ paddingBottom: '0.5rem' }}>
-                    <CardTitle style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-                      <FileCode2 size={16} /> Relevant Files
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
+                <div className="panel">
+                  <div className="px-4 py-2.5 border-b border-border bg-surface-hover flex items-center gap-2">
+                    <FileCode2 size={14} className="text-muted" />
+                    <h3 className="text-sm font-semibold text-primary m-0">Relevant Files</h3>
+                  </div>
+                  <div className="p-3 bg-surface">
+                    <ul className="m-0 pl-5 text-xs text-secondary font-mono space-y-1">
                       {result.relevantFiles.map((file, idx) => (
-                        <li key={idx} style={{ marginBottom: '0.25rem' }}><code>{file}</code></li>
+                        <li key={idx}><code className="text-primary">{file}</code></li>
                       ))}
                     </ul>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
 
               {(result.likelyCauses && result.likelyCauses.length > 0) && (
-                <Card>
-                  <CardHeader style={{ paddingBottom: '0.5rem' }}>
-                    <CardTitle style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-                      <Lightbulb size={16} /> Possible Causes
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.875rem' }}>
+                <div className="panel">
+                  <div className="px-4 py-2.5 border-b border-border bg-surface-hover flex items-center gap-2">
+                    <Lightbulb size={14} className="text-warning" />
+                    <h3 className="text-sm font-semibold text-primary m-0">Possible Causes</h3>
+                  </div>
+                  <div className="p-4 bg-surface">
+                    <ul className="m-0 pl-5 text-xs text-secondary space-y-1.5 leading-relaxed">
                       {result.likelyCauses.map((cause, idx) => (
-                        <li key={idx} style={{ marginBottom: '0.25rem' }}>{cause}</li>
+                        <li key={idx}>{cause}</li>
                       ))}
                     </ul>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
 
               {(result.potentialSideEffects || result.prevention) && (
-                <Card>
-                  <CardHeader style={{ paddingBottom: '0.5rem' }}>
-                    <CardTitle style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-                      <ShieldAlert size={16} /> Next Steps
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.875rem' }}>
+                <div className="panel">
+                  <div className="px-4 py-2.5 border-b border-border bg-surface-hover flex items-center gap-2">
+                    <ShieldAlert size={14} className="text-accent" />
+                    <h3 className="text-sm font-semibold text-primary m-0">Next Steps</h3>
+                  </div>
+                  <div className="p-4 bg-surface flex flex-col gap-4 text-xs">
                     {result.potentialSideEffects && (
                       <div>
-                        <strong>Potential Side Effects:</strong>
-                        <p style={{ color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>{result.potentialSideEffects}</p>
+                        <strong className="text-primary uppercase tracking-wider text-[10px]">Potential Side Effects</strong>
+                        <p className="text-secondary mt-1 leading-relaxed">{result.potentialSideEffects}</p>
                       </div>
                     )}
                     {result.prevention && (
                       <div>
-                        <strong>Prevention:</strong>
-                        <p style={{ color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>{result.prevention}</p>
+                        <strong className="text-primary uppercase tracking-wider text-[10px]">Prevention</strong>
+                        <p className="text-secondary mt-1 leading-relaxed">{result.prevention}</p>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
             </div>
           )}

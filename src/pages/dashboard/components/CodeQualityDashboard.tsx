@@ -15,6 +15,7 @@ import {
   Wrench, 
   HelpCircle
 } from 'lucide-react';
+import { Button } from '../../../components/ui/Button';
 
 interface StaticAnalysisFinding {
   id: number;
@@ -173,296 +174,162 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
     switch (severity.toLowerCase()) {
       case 'high':
         return (
-          <span style={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            gap: '4px',
-            padding: '2px 8px', 
-            borderRadius: '12px', 
-            fontSize: '0.75rem', 
-            fontWeight: 600,
-            backgroundColor: 'rgba(239, 68, 68, 0.15)',
-            color: '#f87171',
-            border: '1px solid rgba(239, 68, 68, 0.3)'
-          }}>
-            <ShieldAlert size={12} /> High
+          <span className="badge badge-error">
+            <ShieldAlert size={12} className="mr-1" /> High
           </span>
         );
       case 'medium':
         return (
-          <span style={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            gap: '4px',
-            padding: '2px 8px', 
-            borderRadius: '12px', 
-            fontSize: '0.75rem', 
-            fontWeight: 600,
-            backgroundColor: 'rgba(245, 158, 11, 0.15)',
-            color: '#fbbf24',
-            border: '1px solid rgba(245, 158, 11, 0.3)'
-          }}>
-            <AlertTriangle size={12} /> Medium
+          <span className="badge badge-warning">
+            <AlertTriangle size={12} className="mr-1" /> Medium
           </span>
         );
       default:
         return (
-          <span style={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            gap: '4px',
-            padding: '2px 8px', 
-            borderRadius: '12px', 
-            fontSize: '0.75rem', 
-            fontWeight: 600,
-            backgroundColor: 'rgba(59, 130, 246, 0.15)',
-            color: '#60a5fa',
-            border: '1px solid rgba(59, 130, 246, 0.3)'
-          }}>
-            <Info size={12} /> Low
+          <span className="badge badge-info">
+            <Info size={12} className="mr-1" /> Low
           </span>
         );
     }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '16px', overflow: 'hidden' }}>
+    <div className="flex flex-col h-full bg-bg">
       
       {/* Top Banner & Action */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        padding: '16px 20px', 
-        backgroundColor: 'var(--color-surface)', 
-        borderRadius: '12px',
-        border: '1px solid var(--color-border)',
-        flexShrink: 0
-      }}>
+      <div className="panel border-b-0 border-l-0 border-r-0 rounded-none flex justify-between items-center px-4 py-3 shrink-0 bg-surface">
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Code2 size={20} color="var(--color-primary)" /> Static Code Quality Analysis
+          <h2 className="text-sm font-semibold text-primary flex items-center gap-2 m-0">
+            <Code2 size={16} className="text-accent" /> Static Code Quality Analysis
           </h2>
-          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
+          <p className="text-xs text-secondary mt-1 m-0">
             Deterministic AST checks covering complexity, maintainability, code smells, and architecture rules.
           </p>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-            <span style={{ color: 'var(--color-text-secondary)' }}>Status:</span>
-            <span style={{ 
-              fontWeight: 600, 
-              padding: '2px 8px', 
-              borderRadius: '4px',
-              backgroundColor: status === 'COMPLETED' ? 'rgba(34, 197, 94, 0.15)' : status === 'PROCESSING' || status === 'QUEUED' ? 'rgba(234, 179, 8, 0.15)' : 'var(--color-surface-hover)',
-              color: status === 'COMPLETED' ? '#4ade80' : status === 'PROCESSING' || status === 'QUEUED' ? '#facc15' : 'var(--color-text-secondary)'
-            }}>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-secondary">Status:</span>
+            <span className={
+              status === 'COMPLETED' ? 'text-success font-semibold' : 
+              status === 'PROCESSING' || status === 'QUEUED' ? 'text-warning font-semibold' : 
+              'text-secondary'
+            }>
               {status}
             </span>
           </div>
 
-          <button
+          <Button
             onClick={startAnalysis}
             disabled={status === 'QUEUED' || status === 'PROCESSING'}
-            className="btn-primary"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 16px',
-              backgroundColor: status === 'QUEUED' || status === 'PROCESSING' ? '#4b5563' : 'var(--color-primary)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontWeight: 500,
-              cursor: status === 'QUEUED' || status === 'PROCESSING' ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s ease'
-            }}
+            className="btn-primary py-1 px-3 text-xs flex items-center gap-2"
           >
             {status === 'QUEUED' || status === 'PROCESSING' ? (
               <>
-                <RefreshCw size={14} className="animate-spin" /> Analyzing...
+                <RefreshCw size={12} className="animate-spin" /> Analyzing
               </>
             ) : (
               <>
-                <Play size={14} /> Run Analysis
+                <Play size={12} /> Run Analysis
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
       {status === 'COMPLETED' && (
-        <>
+        <div className="flex flex-col flex-1 overflow-hidden">
           {/* Summary Cards */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', 
-            gap: '12px',
-            flexShrink: 0
-          }}>
+          <div className="grid grid-cols-5 gap-0 border-b border-border shrink-0 bg-surface">
             {/* Total */}
-            <div style={{ 
-              padding: '14px 16px', 
-              backgroundColor: 'var(--color-surface)', 
-              borderRadius: '10px', 
-              border: '1px solid var(--color-border)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Issues</span>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                <span style={{ fontSize: '1.6rem', fontWeight: 700 }}>{metrics.total}</span>
-                <span style={{ fontSize: '0.75rem', color: '#f87171' }}>{metrics.high} high</span>
+            <div className="p-3 border-r border-border flex flex-col gap-1">
+              <span className="text-[10px] text-secondary uppercase tracking-wider font-semibold">Total Issues</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-mono font-bold text-primary">{metrics.total}</span>
+                <span className="text-[10px] text-error font-medium">{metrics.high} high</span>
               </div>
             </div>
 
             {/* Complexity */}
-            <div style={{ 
-              padding: '14px 16px', 
-              backgroundColor: 'var(--color-surface)', 
-              borderRadius: '10px', 
-              border: '1px solid var(--color-border)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Flame size={14} color="#f59e0b" /> Complexity
+            <div className="p-3 border-r border-border flex flex-col gap-1">
+              <span className="text-[10px] text-secondary uppercase tracking-wider font-semibold flex items-center gap-1">
+                <Flame size={12} className="text-warning" /> Complexity
               </span>
-              <span style={{ fontSize: '1.6rem', fontWeight: 700 }}>{metrics.complexity}</span>
+              <span className="text-lg font-mono font-bold text-primary">{metrics.complexity}</span>
             </div>
 
             {/* Maintainability */}
-            <div style={{ 
-              padding: '14px 16px', 
-              backgroundColor: 'var(--color-surface)', 
-              borderRadius: '10px', 
-              border: '1px solid var(--color-border)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Wrench size={14} color="#3b82f6" /> Maintainability
+            <div className="p-3 border-r border-border flex flex-col gap-1">
+              <span className="text-[10px] text-secondary uppercase tracking-wider font-semibold flex items-center gap-1">
+                <Wrench size={12} className="text-accent" /> Maintainability
               </span>
-              <span style={{ fontSize: '1.6rem', fontWeight: 700 }}>{metrics.maintainability}</span>
+              <span className="text-lg font-mono font-bold text-primary">{metrics.maintainability}</span>
             </div>
 
             {/* Code Smells */}
-            <div style={{ 
-              padding: '14px 16px', 
-              backgroundColor: 'var(--color-surface)', 
-              borderRadius: '10px', 
-              border: '1px solid var(--color-border)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <AlertTriangle size={14} color="#ec4899" /> Code Smells
+            <div className="p-3 border-r border-border flex flex-col gap-1">
+              <span className="text-[10px] text-secondary uppercase tracking-wider font-semibold flex items-center gap-1">
+                <AlertTriangle size={12} className="text-pink-500" /> Code Smells
               </span>
-              <span style={{ fontSize: '1.6rem', fontWeight: 700 }}>{metrics.codeSmells}</span>
+              <span className="text-lg font-mono font-bold text-primary">{metrics.codeSmells}</span>
             </div>
 
             {/* Architecture */}
-            <div style={{ 
-              padding: '14px 16px', 
-              backgroundColor: 'var(--color-surface)', 
-              borderRadius: '10px', 
-              border: '1px solid var(--color-border)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Layers size={14} color="#8b5cf6" /> Architecture
+            <div className="p-3 flex flex-col gap-1">
+              <span className="text-[10px] text-secondary uppercase tracking-wider font-semibold flex items-center gap-1">
+                <Layers size={12} className="text-purple-500" /> Architecture
               </span>
-              <span style={{ fontSize: '1.6rem', fontWeight: 700 }}>{metrics.architecture}</span>
+              <span className="text-lg font-mono font-bold text-primary">{metrics.architecture}</span>
             </div>
           </div>
 
-          {/* Main Content Area: Left list & Right Inspector */}
-          <div style={{ display: 'flex', flex: 1, gap: '16px', overflow: 'hidden' }}>
+          {/* Main Content Area: Split Pane */}
+          <div className="flex flex-1 overflow-hidden">
             
             {/* Left Panel: Filter & List */}
-            <div style={{ 
-              flex: '0 0 380px', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              backgroundColor: 'var(--color-surface)',
-              borderRadius: '12px',
-              border: '1px solid var(--color-border)',
-              padding: '14px',
-              gap: '12px',
-              overflow: 'hidden'
-            }}>
-              {/* Search Bar */}
-              <div style={{ position: 'relative' }}>
-                <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-secondary)' }} />
-                <input
-                  type="text"
-                  placeholder="Search file or issue..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px 8px 30px',
-                    borderRadius: '6px',
-                    border: '1px solid var(--color-border)',
-                    backgroundColor: 'rgba(0,0,0,0.2)',
-                    color: 'var(--color-text)',
-                    fontSize: '0.85rem'
-                  }}
-                />
-              </div>
+            <div className="flex flex-col w-[350px] border-r border-border bg-surface-hover/30 shrink-0">
+              
+              {/* Search & Filters */}
+              <div className="p-2 border-b border-border flex flex-col gap-2 bg-surface">
+                <div className="relative">
+                  <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted" />
+                  <input
+                    type="text"
+                    placeholder="Search file or issue..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="input w-full pl-7 text-xs py-1.5"
+                  />
+                </div>
 
-              {/* Filters Row */}
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <select
-                  value={filterSeverity}
-                  onChange={e => setFilterSeverity(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: '6px 8px',
-                    borderRadius: '6px',
-                    border: '1px solid var(--color-border)',
-                    backgroundColor: 'rgba(0,0,0,0.2)',
-                    color: 'var(--color-text)',
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  <option value="ALL">All Severities</option>
-                  <option value="High">High ({metrics.high})</option>
-                  <option value="Medium">Medium ({metrics.medium})</option>
-                  <option value="Low">Low ({metrics.low})</option>
-                </select>
+                <div className="flex gap-2">
+                  <select
+                    value={filterSeverity}
+                    onChange={e => setFilterSeverity(e.target.value)}
+                    className="select flex-1 text-xs py-1"
+                  >
+                    <option value="ALL">All Severities</option>
+                    <option value="High">High ({metrics.high})</option>
+                    <option value="Medium">Medium ({metrics.medium})</option>
+                    <option value="Low">Low ({metrics.low})</option>
+                  </select>
 
-                <select
-                  value={filterCategory}
-                  onChange={e => setFilterCategory(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: '6px 8px',
-                    borderRadius: '6px',
-                    border: '1px solid var(--color-border)',
-                    backgroundColor: 'rgba(0,0,0,0.2)',
-                    color: 'var(--color-text)',
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  <option value="ALL">All Categories</option>
-                  <option value="Complexity">Complexity</option>
-                  <option value="Maintainability">Maintainability</option>
-                  <option value="Code Smells">Code Smells</option>
-                  <option value="Architecture">Architecture</option>
-                </select>
+                  <select
+                    value={filterCategory}
+                    onChange={e => setFilterCategory(e.target.value)}
+                    className="select flex-1 text-xs py-1"
+                  >
+                    <option value="ALL">All Categories</option>
+                    <option value="Complexity">Complexity</option>
+                    <option value="Maintainability">Maintainability</option>
+                    <option value="Code Smells">Code Smells</option>
+                    <option value="Architecture">Architecture</option>
+                  </select>
+                </div>
               </div>
 
               {/* Issues List */}
-              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '4px' }}>
+              <div className="flex-1 overflow-y-auto">
                 {filteredFindings.map(finding => {
                   const isSelected = selectedFinding?.id === finding.id;
                   const fileShortName = finding.fileName.split('/').pop();
@@ -470,33 +337,25 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
                     <div
                       key={finding.id}
                       onClick={() => handleSelectFinding(finding)}
-                      style={{
-                        padding: '12px',
-                        borderRadius: '8px',
-                        border: isSelected ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
-                        backgroundColor: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'rgba(0,0,0,0.15)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '6px',
-                        transition: 'all 0.15s ease'
-                      }}
+                      className={`p-3 border-b border-border cursor-pointer transition-colors ${
+                        isSelected ? 'bg-accent/10 border-l-2 border-l-accent' : 'hover:bg-surface-hover border-l-2 border-l-transparent'
+                      }`}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>
+                      <div className="flex justify-between items-start mb-1.5">
+                        <span className="text-[10px] text-muted font-mono uppercase tracking-wider">
                           {finding.category}
                         </span>
                         {getSeverityBadge(finding.severity)}
                       </div>
 
-                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: isSelected ? 'var(--color-primary)' : 'var(--color-text)' }}>
+                      <div className={`font-medium text-xs mb-1.5 line-clamp-2 ${isSelected ? 'text-primary' : 'text-secondary'}`}>
                         {finding.title}
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-                        <FileCode size={13} />
-                        <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                          {fileShortName} : Line {finding.line}
+                      <div className="flex items-center gap-1.5 text-[11px] text-muted font-mono">
+                        <FileCode size={11} />
+                        <span className="truncate" title={finding.fileName}>
+                          {fileShortName}:{finding.line}
                         </span>
                       </div>
                     </div>
@@ -504,8 +363,8 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
                 })}
 
                 {filteredFindings.length === 0 && (
-                  <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
-                    <CheckCircle2 size={32} color="#22c55e" style={{ margin: '0 auto 10px auto' }} />
+                  <div className="p-8 text-center text-secondary text-sm">
+                    <CheckCircle2 size={24} className="text-success mx-auto mb-2" />
                     <p>No issues matching your filters.</p>
                   </div>
                 )}
@@ -513,70 +372,35 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
             </div>
 
             {/* Right Panel: Finding Inspector */}
-            <div style={{ 
-              flex: 1, 
-              backgroundColor: 'var(--color-surface)',
-              borderRadius: '12px',
-              border: '1px solid var(--color-border)',
-              padding: '20px',
-              overflowY: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '18px'
-            }}>
+            <div className="flex-1 bg-bg overflow-y-auto flex flex-col">
               {selectedFinding ? (
-                <>
+                <div className="p-6 max-w-4xl mx-auto w-full flex flex-col gap-6">
                   {/* Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px' }}>
+                  <div className="flex justify-between items-start border-b border-border pb-4">
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                      <div className="flex items-center gap-2 mb-2">
                         {getSeverityBadge(selectedFinding.severity)}
-                        <span style={{ 
-                          fontSize: '0.75rem', 
-                          padding: '2px 8px', 
-                          borderRadius: '4px', 
-                          backgroundColor: 'rgba(255,255,255,0.06)',
-                          color: 'var(--color-text-secondary)',
-                          fontWeight: 500
-                        }}>
+                        <span className="text-xs px-2 py-0.5 rounded-sm bg-surface-hover text-secondary font-mono border border-border">
                           {selectedFinding.category}
                         </span>
                       </div>
-                      <h3 style={{ fontSize: '1.3rem', fontWeight: 600, margin: 0 }}>{selectedFinding.title}</h3>
+                      <h3 className="text-lg font-semibold text-primary m-0">{selectedFinding.title}</h3>
                     </div>
 
-                    <div style={{ 
-                      padding: '6px 12px', 
-                      backgroundColor: 'rgba(0,0,0,0.25)', 
-                      borderRadius: '6px', 
-                      fontSize: '0.8rem', 
-                      fontFamily: 'monospace',
-                      color: 'var(--color-text-secondary)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}>
-                      <FileCode size={14} />
+                    <div className="px-3 py-1.5 bg-surface rounded border border-border text-xs font-mono text-secondary flex items-center gap-2">
+                      <FileCode size={14} className="text-muted" />
                       {selectedFinding.fileName}:{selectedFinding.line}
                     </div>
                   </div>
 
                   {/* Metric / Evidence Banner */}
-                  <div style={{ 
-                    padding: '12px 16px', 
-                    borderRadius: '8px', 
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)', 
-                    border: '1px solid rgba(99, 102, 241, 0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px'
-                  }}>
-                    <Flame size={18} color="var(--color-primary)" />
+                  <div className="p-3 rounded border border-accent/30 bg-accent/5 flex items-start gap-3">
+                    <Flame size={16} className="text-accent mt-0.5" />
                     <div>
-                      <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+                      <div className="text-[10px] uppercase text-accent font-semibold tracking-wider mb-0.5">
                         Metric Evidence
                       </div>
-                      <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-text)' }}>
+                      <div className="text-sm font-medium text-primary">
                         {selectedFinding.metric}
                       </div>
                     </div>
@@ -584,53 +408,35 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
 
                   {/* Code Context Preview */}
                   <div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Code2 size={15} /> Code Context (Around Line {selectedFinding.line})
+                    <div className="text-xs font-semibold text-secondary mb-2 flex items-center gap-2 uppercase tracking-wider">
+                      <Code2 size={14} /> Code Context (Line {selectedFinding.line})
                     </div>
                     {loadingSnippet ? (
-                      <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
+                      <div className="p-6 text-center text-muted text-sm border border-border rounded bg-surface">
                         Loading code snippet...
                       </div>
                     ) : fileSnippet ? (
-                      <div style={{ 
-                        fontFamily: 'Consolas, Monaco, "Courier New", monospace', 
-                        fontSize: '0.85rem',
-                        backgroundColor: '#0d1117',
-                        borderRadius: '8px',
-                        border: '1px solid var(--color-border)',
-                        overflow: 'hidden'
-                      }}>
+                      <div className="font-mono text-xs bg-[#0d1117] rounded border border-border overflow-hidden">
                         {fileSnippet.content.split('\n').map((lineText, idx) => {
                           const currentLineNum = fileSnippet.startLine + idx;
                           const isTarget = currentLineNum === selectedFinding.line;
                           return (
                             <div 
                               key={idx}
-                              style={{ 
-                                display: 'flex', 
-                                backgroundColor: isTarget ? 'rgba(239, 68, 68, 0.15)' : 'transparent',
-                                borderLeft: isTarget ? '3px solid #ef4444' : '3px solid transparent',
-                                padding: '2px 8px'
-                              }}
+                              className={`flex px-2 py-0.5 ${isTarget ? 'bg-error/15 border-l-2 border-error' : 'border-l-2 border-transparent hover:bg-white/5'}`}
                             >
-                              <span style={{ width: '40px', textAlign: 'right', marginRight: '16px', color: isTarget ? '#ef4444' : '#6e7681', userSelect: 'none' }}>
+                              <span className="w-10 text-right mr-4 text-muted select-none">
                                 {currentLineNum}
                               </span>
-                              <span style={{ color: isTarget ? '#ffffff' : '#c9d1d9', whiteSpace: 'pre' }}>
-                                {lineText}
+                              <span className={`${isTarget ? 'text-white' : 'text-[#c9d1d9]'} whitespace-pre`}>
+                                {lineText || ' '}
                               </span>
                             </div>
                           );
                         })}
                       </div>
                     ) : (
-                      <div style={{ 
-                        padding: '14px', 
-                        borderRadius: '6px', 
-                        backgroundColor: 'rgba(0,0,0,0.2)', 
-                        color: 'var(--color-text-secondary)',
-                        fontSize: '0.85rem'
-                      }}>
+                      <div className="p-3 rounded border border-border bg-surface text-secondary text-sm font-mono">
                         {selectedFinding.fileName}:{selectedFinding.line}
                       </div>
                     )}
@@ -638,96 +444,56 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
 
                   {/* Description / Explanation */}
                   <div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+                    <div className="text-xs font-semibold text-secondary mb-2 uppercase tracking-wider">
                       Explanation
                     </div>
-                    <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.5', color: 'var(--color-text)' }}>
+                    <div className="text-sm text-primary leading-relaxed bg-surface p-4 rounded border border-border">
                       {selectedFinding.description}
-                    </p>
+                    </div>
                   </div>
 
                   {/* Recommendation */}
-                  <div style={{ 
-                    padding: '14px 16px', 
-                    borderRadius: '8px', 
-                    backgroundColor: 'rgba(34, 197, 94, 0.08)', 
-                    border: '1px solid rgba(34, 197, 94, 0.25)',
-                    marginTop: 'auto'
-                  }}>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#4ade80', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <CheckCircle2 size={15} /> Actionable Recommendation
+                  <div>
+                    <div className="text-xs font-semibold text-success mb-2 uppercase tracking-wider flex items-center gap-1.5">
+                      <CheckCircle2 size={14} /> Actionable Recommendation
                     </div>
-                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#86efac', lineHeight: '1.4' }}>
+                    <div className="text-sm text-success leading-relaxed bg-success/10 p-4 rounded border border-success/30">
                       {selectedFinding.recommendation}
-                    </p>
+                    </div>
                   </div>
-                </>
+                </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-secondary)', gap: '10px' }}>
-                  <HelpCircle size={36} style={{ opacity: 0.5 }} />
-                  <p>Select an issue from the list to view code context, metrics, and remediation.</p>
+                <div className="flex flex-col items-center justify-center h-full text-muted gap-3">
+                  <HelpCircle size={48} className="opacity-20" />
+                  <p className="text-sm">Select an issue from the list to view code context and metrics.</p>
                 </div>
               )}
             </div>
 
           </div>
-        </>
+        </div>
       )}
 
       {status !== 'COMPLETED' && status !== 'NONE' && (
-        <div style={{ 
-          flex: 1, 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          backgroundColor: 'var(--color-surface)',
-          borderRadius: '12px',
-          border: '1px solid var(--color-border)',
-          padding: '40px',
-          textAlign: 'center'
-        }}>
-          <RefreshCw size={36} color="var(--color-primary)" className="animate-spin" style={{ marginBottom: '16px' }} />
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '8px' }}>Static Analysis in Progress</h3>
-          <p style={{ color: 'var(--color-text-secondary)', maxWidth: '420px', margin: 0 }}>
+        <div className="flex-1 flex flex-col items-center justify-center bg-bg text-center p-8">
+          <RefreshCw size={32} className="text-accent animate-spin mb-4" />
+          <h3 className="text-lg font-medium text-primary mb-2">Static Analysis in Progress</h3>
+          <p className="text-secondary text-sm max-w-md mx-auto">
             Analyzing Java AST structures, calculating cyclomatic complexity, nesting depth, and detecting architectural code smells.
           </p>
         </div>
       )}
 
       {status === 'NONE' && (
-        <div style={{ 
-          flex: 1, 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          backgroundColor: 'var(--color-surface)',
-          borderRadius: '12px',
-          border: '1px solid var(--color-border)',
-          padding: '40px',
-          textAlign: 'center'
-        }}>
-          <ShieldAlert size={44} color="var(--color-primary)" style={{ marginBottom: '16px', opacity: 0.8 }} />
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '8px' }}>No Static Analysis Run Yet</h3>
-          <p style={{ color: 'var(--color-text-secondary)', maxWidth: '420px', marginBottom: '20px' }}>
+        <div className="flex-1 flex flex-col items-center justify-center bg-bg text-center p-8">
+          <ShieldAlert size={48} className="text-muted mb-4" />
+          <h3 className="text-lg font-medium text-primary mb-2">No Static Analysis Run Yet</h3>
+          <p className="text-secondary text-sm max-w-md mx-auto mb-6">
             Execute deterministic checks on this codebase to find complexity hotspots, maintainability bottlenecks, and architectural code smells.
           </p>
-          <button 
-            onClick={startAnalysis}
-            className="btn-primary"
-            style={{
-              padding: '10px 20px',
-              backgroundColor: 'var(--color-primary)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontWeight: 500,
-              cursor: 'pointer'
-            }}
-          >
+          <Button onClick={startAnalysis} className="btn-primary">
             Run Static Analysis
-          </button>
+          </Button>
         </div>
       )}
 

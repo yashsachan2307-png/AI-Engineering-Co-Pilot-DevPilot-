@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { CodeQualityDashboard } from './components/CodeQualityDashboard';
-import { FolderGit2, ArrowRight } from 'lucide-react';
+import { FolderGit2, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '../../components/ui/Button';
 
 interface Repo {
   id: number;
@@ -46,30 +48,32 @@ export function CodeAnalyzer() {
       {/* Header bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexShrink: 0 }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>Static Code Analyzer</h1>
-          <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: '4px 0 0 0' }}>
-            Run deterministic static analysis rules, detect complexity hotspots, code smells, and coupling issues.
+          <h1 className="text-xl font-semibold text-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ShieldCheck className="text-accent" size={20} />
+            Static Code Analyzer
+          </h1>
+          <p className="text-secondary text-sm mt-1">
+            Deterministic analysis, complexity hotspots, and code smell detection
           </p>
         </div>
 
         {repositories.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <label style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Repository:</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-surface)' }}>
+            <FolderGit2 size={14} className="text-muted" />
             <select
               value={selectedRepoId}
               onChange={e => setSelectedRepoId(e.target.value)}
               style={{
-                padding: '6px 12px',
-                borderRadius: '6px',
-                border: '1px solid var(--color-border)',
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text)',
-                fontSize: '0.85rem',
-                fontWeight: 500
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--color-text-primary)',
+                fontSize: '12px',
+                outline: 'none',
+                cursor: 'pointer'
               }}
             >
               {repositories.map(r => (
-                <option key={r.id} value={String(r.id)}>
+                <option key={r.id} value={String(r.id)} style={{ background: 'var(--color-surface)' }}>
                   {r.name} ({r.language || 'Code'})
                 </option>
               ))}
@@ -80,47 +84,24 @@ export function CodeAnalyzer() {
 
       {/* Main Container */}
       {loading ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '13px' }}>
           Loading repositories...
         </div>
       ) : repositories.length === 0 ? (
-        <div style={{ 
-          flex: 1, 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          backgroundColor: 'var(--color-surface)',
-          borderRadius: '12px',
-          border: '1px solid var(--color-border)',
-          padding: '40px',
-          textAlign: 'center'
-        }}>
-          <FolderGit2 size={48} color="var(--color-primary)" style={{ marginBottom: '16px', opacity: 0.8 }} />
-          <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>No Imported Repositories Found</h3>
-          <p style={{ color: 'var(--color-text-secondary)', maxWidth: '440px', marginBottom: '20px' }}>
+        <div className="card" style={{ maxWidth: '400px', margin: '40px auto', textAlign: 'center', padding: '32px' }}>
+          <FolderGit2 size={32} className="text-accent" style={{ margin: '0 auto 16px' }} />
+          <h3 className="text-primary font-semibold text-lg mb-2">No Repositories Found</h3>
+          <p className="text-secondary text-sm mb-6">
             Connect your GitHub account or import a repository to begin running static quality analysis and complexity checks.
           </p>
-          <a
-            href="/dashboard/projects"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 18px',
-              backgroundColor: 'var(--color-primary)',
-              color: 'white',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              fontWeight: 500,
-              fontSize: '0.9rem'
-            }}
-          >
-            Go to Projects <ArrowRight size={16} />
-          </a>
+          <Link to="/dashboard/projects" style={{ display: 'block' }}>
+            <Button className="btn-primary w-full justify-center">
+              Go to Projects <ArrowRight size={14} className="ml-1" />
+            </Button>
+          </Link>
         </div>
       ) : (
-        <div style={{ flex: 1, overflow: 'hidden' }}>
+        <div style={{ flex: 1, overflow: 'hidden', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
           <CodeQualityDashboard repositoryId={selectedRepoId} />
         </div>
       )}

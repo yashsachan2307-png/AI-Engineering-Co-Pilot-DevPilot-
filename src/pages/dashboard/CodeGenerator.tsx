@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { generateCode, GenerateResponse, FileProposal } from '../../services/generationService';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { 
   FolderGit2, 
@@ -96,35 +95,28 @@ export function CodeGenerator() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingBottom: '2rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+    <div className="flex flex-col gap-4 h-full bg-bg overflow-hidden">
+      <div className="panel border-b-0 border-l-0 border-r-0 rounded-none flex justify-between items-center px-4 py-3 shrink-0 bg-surface">
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Code2 size={24} style={{ color: 'var(--color-accent)' }} />
+          <h1 className="text-sm font-semibold text-primary flex items-center gap-2 m-0">
+            <Code2 size={16} className="text-accent" />
             Repository-Aware Code Generator
           </h1>
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
+          <p className="text-xs text-secondary mt-1 m-0">
             Propose architecture-aware changes to your codebase.
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--color-bg-secondary)', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
-          <FolderGit2 size={16} style={{ color: 'var(--color-text-secondary)' }} />
+        <div className="flex items-center gap-2 px-3 py-1 bg-surface-hover border border-border rounded-sm">
+          <FolderGit2 size={14} className="text-muted" />
           <select
             value={selectedRepoId || ''}
             onChange={(e) => setSelectedRepoId(Number(e.target.value))}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--color-text)',
-              fontWeight: 600,
-              outline: 'none',
-              cursor: 'pointer'
-            }}
+            className="select text-xs py-0.5 border-none bg-transparent pl-0 focus:ring-0 w-48"
           >
             {repositories.length === 0 && <option value="">No repositories imported</option>}
             {repositories.map(r => (
-              <option key={r.id} value={r.id} style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
+              <option key={r.id} value={r.id} className="bg-surface text-primary">
                 {r.fullName || r.name}
               </option>
             ))}
@@ -132,90 +124,82 @@ export function CodeGenerator() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.5rem', alignItems: 'start' }}>
+      <div className="flex flex-1 gap-4 overflow-hidden">
         {/* Left Column: Prompt Input */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <Card>
-            <CardHeader>
-              <CardTitle>What should we build?</CardTitle>
-              <CardDescription>Describe the feature or change.</CardDescription>
-            </CardHeader>
-            <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <textarea 
-                  value={prompt}
-                  onChange={e => setPrompt(e.target.value)}
-                  placeholder="e.g. Add an endpoint for updating a user's profile."
-                  rows={6}
-                  style={{ width: '100%', padding: '0.625rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', fontSize: '0.875rem' }}
-                />
-              </div>
+        <div className="panel w-1/3 flex flex-col shrink-0 bg-surface border-l-0 border-r border-t border-b-0 rounded-none">
+          <div className="px-4 py-3 border-b border-border bg-surface-hover">
+            <h2 className="text-sm font-semibold text-primary m-0">What should we build?</h2>
+            <p className="text-xs text-secondary m-0 mt-0.5">Describe the feature or change.</p>
+          </div>
+          <div className="flex flex-col gap-4 p-4 overflow-y-auto">
+            <div className="flex flex-col gap-1.5 flex-1 min-h-[200px]">
+              <textarea 
+                value={prompt}
+                onChange={e => setPrompt(e.target.value)}
+                placeholder="e.g. Add an endpoint for updating a user's profile."
+                className="input flex-1 text-xs resize-none"
+              />
+            </div>
 
-              <Button 
-                variant="accent" 
-                onClick={handleGenerate} 
-                disabled={!selectedRepoId || !prompt.trim() || isGenerating}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%' }}
-              >
-                {isGenerating ? (
-                  <><RefreshCw size={16} className="animate-spin" /> Analyzing Architecture & Generating...</>
-                ) : (
-                  <><Code2 size={16} /> Generate Proposal</>
-                )}
-              </Button>
-
-              {error && (
-                <div style={{ padding: '0.75rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: 'var(--radius-md)', fontSize: '0.875rem' }}>
-                  {error}
-                </div>
+            <Button 
+              className="btn-primary w-full justify-center text-xs py-2"
+              onClick={handleGenerate} 
+              disabled={!selectedRepoId || !prompt.trim() || isGenerating}
+            >
+              {isGenerating ? (
+                <><RefreshCw size={14} className="animate-spin mr-2" /> Analyzing Architecture & Generating...</>
+              ) : (
+                <><Code2 size={14} className="mr-2" /> Generate Proposal</>
               )}
-            </CardContent>
-          </Card>
+            </Button>
 
-          {result?.explanation && (
-             <Card style={{ borderColor: 'var(--color-accent)' }}>
-                <CardHeader style={{ paddingBottom: '0.5rem' }}>
-                  <CardTitle style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-                    <Info size={16} /> Strategy Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+            {error && (
+              <div className="p-3 bg-error/10 text-error border border-error/30 rounded text-xs mt-2">
+                {error}
+              </div>
+            )}
+            
+            {result?.explanation && (
+              <div className="panel border-l-2 border-accent mt-4">
+                <div className="px-3 py-2 border-b border-border bg-surface-hover flex items-center gap-2">
+                  <Info size={14} className="text-accent" />
+                  <h3 className="text-xs font-semibold text-primary m-0">Strategy Overview</h3>
+                </div>
+                <div className="p-3 bg-surface">
+                  <p className="text-xs text-secondary leading-relaxed">
                     {result.explanation}
                   </p>
-                </CardContent>
-             </Card>
-          )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Column: Results & Diff Viewer */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="flex-1 overflow-y-auto pr-4 pb-4">
           {!result && !isGenerating && (
-            <Card style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px', backgroundColor: 'var(--color-bg-secondary)', borderStyle: 'dashed' }}>
-              <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-                <Code2 size={48} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />
-                <p>Submit a request to generate architecture-aware code proposals.</p>
-              </div>
-            </Card>
+            <div className="h-full flex flex-col items-center justify-center text-muted border border-dashed border-border rounded-lg bg-surface/50 min-h-[400px]">
+              <Code2 size={48} className="opacity-30 mb-4" />
+              <p className="text-sm">Submit a request to generate architecture-aware code proposals.</p>
+            </div>
           )}
 
           {isGenerating && (
-            <Card style={{ height: '100%', minHeight: '400px' }}>
-              <CardContent style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
-                <RefreshCw size={32} className="animate-spin" style={{ color: 'var(--color-accent)' }} />
-                <p style={{ fontWeight: 600 }}>Crafting Proposal...</p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', textAlign: 'center', maxWidth: '80%' }}>
-                  Inspecting controllers, services, DTOs, and repositories to ensure the generated code fits your established patterns.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="h-full flex flex-col items-center justify-center min-h-[400px]">
+              <RefreshCw size={32} className="text-accent animate-spin mb-4" />
+              <p className="text-sm font-semibold text-primary">Crafting Proposal...</p>
+              <p className="text-xs text-secondary text-center max-w-sm mt-2">
+                Inspecting controllers, services, DTOs, and repositories to ensure the generated code fits your established patterns.
+              </p>
+            </div>
           )}
 
           {result && result.proposals && result.proposals.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FileCode2 size={20} /> Proposed File Changes ({result.proposals.length})
-              </h2>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 px-1">
+                <FileCode2 size={16} className="text-muted" />
+                <h2 className="text-sm font-semibold text-primary m-0">Proposed File Changes ({result.proposals.length})</h2>
+              </div>
               
               {result.proposals.map((proposal, idx) => {
                 const isApproved = approvedFiles.has(proposal.path);
@@ -223,44 +207,39 @@ export function CodeGenerator() {
                 const currentTab = activeTab[proposal.path] || 'new';
 
                 return (
-                  <Card 
+                  <div 
                     key={idx} 
-                    style={{ 
-                      opacity: isRejected ? 0.6 : 1,
-                      borderColor: isApproved ? 'var(--color-success, #10b981)' : (isRejected ? 'var(--color-danger, #ef4444)' : 'var(--color-border)') 
+                    className={`panel overflow-hidden transition-opacity ${isRejected ? 'opacity-60' : ''}`}
+                    style={{
+                      borderColor: isApproved ? 'var(--color-success)' : (isRejected ? 'var(--color-error)' : 'var(--color-border)')
                     }}
                   >
-                    <CardHeader style={{ paddingBottom: '0.5rem', backgroundColor: 'var(--color-bg-secondary)', borderBottom: '1px solid var(--color-border)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <CardTitle style={{ fontSize: '1rem', fontFamily: 'monospace' }}>
+                    <div className="bg-surface-hover border-b border-border">
+                      <div className="px-4 py-3 flex justify-between items-start gap-4">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-sm font-mono text-primary m-0 flex items-center gap-2 truncate">
                             {proposal.path}
                             {proposal.oldCode ? (
-                              <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: 'rgba(234, 179, 8, 0.2)', color: '#eab308', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>MODIFIED</span>
+                              <span className="text-[10px] bg-warning/20 text-warning px-1.5 py-0.5 rounded tracking-wider font-sans">MODIFIED</span>
                             ) : (
-                              <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#10b981', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>NEW</span>
+                              <span className="text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded tracking-wider font-sans">NEW</span>
                             )}
-                          </CardTitle>
-                          <CardDescription style={{ marginTop: '0.25rem' }}>{proposal.explanation}</CardDescription>
+                          </h3>
+                          <p className="text-xs text-secondary mt-1 m-0 truncate">{proposal.explanation}</p>
                         </div>
                         
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                          <Button size="sm" variant="outline" onClick={() => handleCopy(proposal.newCode)} title="Copy Code">
-                            <Copy size={14} />
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <Button className="btn-secondary px-2 py-1 h-7" onClick={() => handleCopy(proposal.newCode)} title="Copy Code">
+                            <Copy size={12} />
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => handleDownloadPatch(proposal)} title="Download Patch">
-                            <Download size={14} />
+                          <Button className="btn-secondary px-2 py-1 h-7" onClick={() => handleDownloadPatch(proposal)} title="Download Patch">
+                            <Download size={12} />
                           </Button>
                           
-                          <div style={{ width: '1px', backgroundColor: 'var(--color-border)', margin: '0 0.25rem' }}></div>
+                          <div className="w-px h-4 bg-border mx-1"></div>
                           
                           <Button 
-                            size="sm" 
-                            variant="outline" 
-                            style={{ 
-                              color: isApproved ? '#10b981' : 'var(--color-text)', 
-                              borderColor: isApproved ? '#10b981' : 'var(--color-border)' 
-                            }}
+                            className={`btn-secondary text-[11px] px-2.5 py-1 h-7 ${isApproved ? 'border-success text-success bg-success/10' : ''}`}
                             onClick={() => {
                               const newApp = new Set(approvedFiles);
                               newApp.add(proposal.path);
@@ -270,15 +249,10 @@ export function CodeGenerator() {
                               setRejectedFiles(newRej);
                             }}
                           >
-                            <Check size={14} /> {isApproved ? 'Approved' : 'Approve'}
+                            <Check size={12} className="mr-1" /> {isApproved ? 'Approved' : 'Approve'}
                           </Button>
                           <Button 
-                            size="sm" 
-                            variant="outline"
-                            style={{ 
-                              color: isRejected ? '#ef4444' : 'var(--color-text)', 
-                              borderColor: isRejected ? '#ef4444' : 'var(--color-border)' 
-                            }}
+                            className={`btn-secondary text-[11px] px-2.5 py-1 h-7 ${isRejected ? 'border-error text-error bg-error/10' : ''}`}
                             onClick={() => {
                               const newRej = new Set(rejectedFiles);
                               newRej.add(proposal.path);
@@ -288,53 +262,41 @@ export function CodeGenerator() {
                               setApprovedFiles(newApp);
                             }}
                           >
-                            <X size={14} /> {isRejected ? 'Rejected' : 'Reject'}
+                            <X size={12} className="mr-1" /> {isRejected ? 'Rejected' : 'Reject'}
                           </Button>
                         </div>
                       </div>
                       
                       {/* Tabs */}
                       {proposal.oldCode && (
-                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                        <div className="flex gap-4 px-4">
                           <button 
                             onClick={() => setActiveTab({...activeTab, [proposal.path]: 'new'})}
-                            style={{ 
-                              background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600,
-                              color: currentTab === 'new' ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-                              borderBottom: currentTab === 'new' ? '2px solid var(--color-accent)' : '2px solid transparent',
-                              paddingBottom: '0.25rem'
-                            }}
+                            className={`text-xs font-semibold pb-2 border-b-2 transition-colors ${currentTab === 'new' ? 'border-accent text-accent' : 'border-transparent text-secondary hover:text-primary'}`}
                           >
                             Proposed Changes
                           </button>
                           <button 
                             onClick={() => setActiveTab({...activeTab, [proposal.path]: 'old'})}
-                            style={{ 
-                              background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600,
-                              color: currentTab === 'old' ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-                              borderBottom: currentTab === 'old' ? '2px solid var(--color-accent)' : '2px solid transparent',
-                              paddingBottom: '0.25rem'
-                            }}
+                            className={`text-xs font-semibold pb-2 border-b-2 transition-colors ${currentTab === 'old' ? 'border-accent text-accent' : 'border-transparent text-secondary hover:text-primary'}`}
                           >
                             Original Code
                           </button>
                         </div>
                       )}
-                    </CardHeader>
+                    </div>
                     
-                    <CardContent style={{ padding: 0 }}>
-                       <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                         <SyntaxHighlighter 
-                           language="java" 
-                           style={vscDarkPlus} 
-                           customStyle={{ margin: 0, border: 'none', borderRadius: '0 0 var(--radius-md) var(--radius-md)' }}
-                           showLineNumbers={true}
-                         >
-                           {currentTab === 'old' && proposal.oldCode ? proposal.oldCode : proposal.newCode}
-                         </SyntaxHighlighter>
-                       </div>
-                    </CardContent>
-                  </Card>
+                    <div className="bg-surface max-h-[500px] overflow-y-auto">
+                       <SyntaxHighlighter 
+                         language="java" 
+                         style={vscDarkPlus} 
+                         customStyle={{ margin: 0, padding: '16px', fontSize: '11px', background: 'transparent' }}
+                         showLineNumbers={true}
+                       >
+                         {currentTab === 'old' && proposal.oldCode ? proposal.oldCode : proposal.newCode}
+                       </SyntaxHighlighter>
+                    </div>
+                  </div>
                 );
               })}
             </div>

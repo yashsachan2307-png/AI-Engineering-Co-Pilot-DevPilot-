@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
 import { Terminal } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import '../../styles/landing.css';
 
 export function Signup() {
   const { signup } = useAuth();
@@ -40,22 +38,24 @@ export function Signup() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
-          <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', color: 'inherit' }}>
-            <Terminal size={24} style={{ color: 'var(--color-accent)' }} />
-            <span style={{ fontWeight: 700, fontSize: '1.25rem' }}>DevPilot</span>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-bg">
+      <div className="panel bg-surface w-full max-w-md p-8">
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex items-center gap-2 mb-6 text-primary hover:text-accent transition-colors">
+            <Terminal size={28} className="text-accent" />
+            <span className="font-bold text-xl tracking-tight">DevPilot</span>
           </Link>
-          <h1 className="auth-title">Create an account</h1>
-          <p className="auth-subtitle">Start building better software today</p>
+          <h1 className="text-2xl font-bold text-primary mb-2">Create an account</h1>
+          <p className="text-sm text-secondary">Start building better software today</p>
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {error && <div style={{ color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '0.75rem', borderRadius: '0.375rem', marginBottom: '1rem', fontSize: '0.875rem' }}>{error}</div>}
-          <div className="auth-form-group">
-            <label className="auth-form-label" htmlFor="name">Full Name</label>
-            <Input 
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+          {error && <div className="text-error bg-error/10 border border-error/20 p-3 rounded-md text-sm">{error}</div>}
+          
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-primary" htmlFor="name">Full Name</label>
+            <input 
+              className="input w-full"
               id="name" 
               type="text" 
               placeholder="Jane Doe" 
@@ -65,9 +65,10 @@ export function Signup() {
             />
           </div>
 
-          <div className="auth-form-group">
-            <label className="auth-form-label" htmlFor="email">Email</label>
-            <Input 
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-primary" htmlFor="email">Email</label>
+            <input 
+              className="input w-full"
               id="email" 
               type="email" 
               placeholder="you@example.com" 
@@ -77,9 +78,10 @@ export function Signup() {
             />
           </div>
           
-          <div className="auth-form-group">
-            <label className="auth-form-label" htmlFor="password">Password</label>
-            <Input 
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-primary" htmlFor="password">Password</label>
+            <input 
+              className="input w-full"
               id="password" 
               type="password" 
               placeholder="••••••••" 
@@ -88,24 +90,25 @@ export function Signup() {
               required 
             />
             {password && (
-              <div style={{ marginTop: '0.25rem' }}>
-                <div className="password-strength">
-                  <div className="strength-bar" style={{ backgroundColor: strength >= 1 ? '#ef4444' : 'var(--color-border)' }}></div>
-                  <div className="strength-bar" style={{ backgroundColor: strength >= 2 ? '#f59e0b' : 'var(--color-border)' }}></div>
-                  <div className="strength-bar" style={{ backgroundColor: strength >= 3 ? '#10b981' : 'var(--color-border)' }}></div>
+              <div className="mt-1">
+                <div className="flex gap-1 mb-1">
+                  <div className={`h-1 flex-1 rounded-sm transition-colors ${strength >= 1 ? 'bg-error' : 'bg-border'}`}></div>
+                  <div className={`h-1 flex-1 rounded-sm transition-colors ${strength >= 2 ? 'bg-warning' : 'bg-border'}`}></div>
+                  <div className={`h-1 flex-1 rounded-sm transition-colors ${strength >= 3 ? 'bg-success' : 'bg-border'}`}></div>
                 </div>
-                <div className="strength-text">
-                  {strength === 1 && <span style={{ color: '#ef4444' }}>Weak</span>}
-                  {strength === 2 && <span style={{ color: '#f59e0b' }}>Medium</span>}
-                  {strength === 3 && <span style={{ color: '#10b981' }}>Strong</span>}
+                <div className="text-[10px] text-right font-medium">
+                  {strength === 1 && <span className="text-error">Weak</span>}
+                  {strength === 2 && <span className="text-warning">Medium</span>}
+                  {strength === 3 && <span className="text-success">Strong</span>}
                 </div>
               </div>
             )}
           </div>
 
-          <div className="auth-form-group">
-            <label className="auth-form-label" htmlFor="confirm">Confirm Password</label>
-            <Input 
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-primary" htmlFor="confirm">Confirm Password</label>
+            <input 
+              className="input w-full"
               id="confirm" 
               type="password" 
               placeholder="••••••••" 
@@ -115,20 +118,20 @@ export function Signup() {
             />
           </div>
 
-          <div style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
-            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', cursor: 'pointer' }}>
-              <input type="checkbox" style={{ accentColor: 'var(--color-accent)', marginTop: '0.25rem' }} required />
-              <span style={{ color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-                I agree to the <a href="#" className="auth-link">Terms of Service</a> and <a href="#" className="auth-link">Privacy Policy</a>.
+          <div className="mt-2 text-sm">
+            <label className="flex items-start gap-2 cursor-pointer group">
+              <input type="checkbox" className="mt-1 rounded border-border bg-[#0f172a] text-accent focus:ring-accent focus:ring-offset-bg cursor-pointer" required />
+              <span className="text-secondary leading-relaxed group-hover:text-primary transition-colors">
+                I agree to the <a href="#" className="text-accent hover:underline">Terms of Service</a> and <a href="#" className="text-accent hover:underline">Privacy Policy</a>.
               </span>
             </label>
           </div>
 
-          <Button type="submit" variant="primary" className="w-full" style={{ marginTop: '0.5rem' }}>Create Account</Button>
+          <Button type="submit" className="btn-primary w-full mt-2">Create Account</Button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-          Already have an account? <Link to="/login" className="auth-link" style={{ fontWeight: 500 }}>Log in</Link>
+        <p className="text-center mt-8 text-sm text-secondary">
+          Already have an account? <Link to="/login" className="text-accent font-medium hover:underline">Log in</Link>
         </p>
       </div>
     </div>

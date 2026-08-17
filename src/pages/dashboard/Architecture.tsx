@@ -4,7 +4,6 @@ import { ArchitectureAnalysis, GraphNode as ApiNode, getArchitecture, explainArc
 import { ReactFlow, Controls, Background, Node, Edge, MarkerType } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Network, FolderGit2, Info, MessageSquare, AlertTriangle, RefreshCw } from 'lucide-react';
 
@@ -99,12 +98,15 @@ export function Architecture() {
         position: { x: 0, y: 0 },
         data: { label: n.name },
         style: {
-          background: n.type === 'CLASS' ? '#bfdbfe' : (n.type === 'INTERFACE' ? '#bbf7d0' : '#fef08a'),
-          border: '1px solid #94a3b8',
+          background: n.type === 'CLASS' ? '#1e293b' : (n.type === 'INTERFACE' ? '#0f172a' : '#334155'),
+          color: '#f8fafc',
+          border: '1px solid #334155',
           borderRadius: '4px',
           padding: '8px',
-          fontSize: '12px',
-          fontWeight: 600
+          fontSize: '11px',
+          fontFamily: 'monospace',
+          fontWeight: 600,
+          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
         }
       }));
       
@@ -114,8 +116,10 @@ export function Architecture() {
         target: e.target,
         type: 'smoothstep',
         animated: false,
+        style: { stroke: '#475569' },
         markerEnd: {
           type: MarkerType.ArrowClosed,
+          color: '#475569'
         }
       }));
       
@@ -161,35 +165,28 @@ export function Architecture() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingBottom: '2rem', height: 'calc(100vh - 100px)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+    <div className="flex flex-col gap-4 h-full bg-bg overflow-hidden">
+      <div className="panel border-b-0 border-l-0 border-r-0 rounded-none flex justify-between items-center px-4 py-3 shrink-0 bg-surface">
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Network size={24} style={{ color: 'var(--color-accent)' }} />
+          <h1 className="text-sm font-semibold text-primary flex items-center gap-2 m-0">
+            <Network size={16} className="text-accent" />
             Architecture & Dependencies
           </h1>
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>
+          <p className="text-xs text-secondary mt-1 m-0">
             Deterministic graph visualization and AI architectural analysis.
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--color-bg-secondary)', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
-          <FolderGit2 size={16} style={{ color: 'var(--color-text-secondary)' }} />
+        <div className="flex items-center gap-2 px-3 py-1 bg-surface-hover border border-border rounded-sm">
+          <FolderGit2 size={14} className="text-muted" />
           <select
             value={selectedRepoId || ''}
             onChange={(e) => setSelectedRepoId(Number(e.target.value))}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--color-text)',
-              fontWeight: 600,
-              outline: 'none',
-              cursor: 'pointer'
-            }}
+            className="select text-xs py-0.5 border-none bg-transparent pl-0 focus:ring-0 w-48"
           >
             {repositories.length === 0 && <option value="">No repositories imported</option>}
             {repositories.map(r => (
-              <option key={r.id} value={r.id} style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}>
+              <option key={r.id} value={r.id} className="bg-surface text-primary">
                 {r.fullName || r.name}
               </option>
             ))}
@@ -197,14 +194,13 @@ export function Architecture() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '1.5rem', flex: 1, minHeight: 0 }}>
+      <div className="flex gap-4 flex-1 overflow-hidden min-h-0">
         {/* Left: Graph */}
-        <Card style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <CardContent style={{ padding: 0, flex: 1, position: 'relative' }}>
+        <div className="panel flex-1 flex flex-col min-w-0 border-l-0 border-r border-t border-b-0 rounded-none relative bg-[#0f172a]">
             {loading ? (
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem', zIndex: 10 }}>
-                <RefreshCw className="animate-spin" size={32} style={{ color: 'var(--color-accent)' }} />
-                <p>Analyzing Architecture...</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-bg/80 backdrop-blur-sm">
+                <RefreshCw className="animate-spin text-accent" size={32} />
+                <p className="text-sm font-semibold text-primary">Analyzing Architecture...</p>
               </div>
             ) : (
               <ReactFlow 
@@ -213,88 +209,86 @@ export function Architecture() {
                 onNodeClick={onNodeClick}
                 fitView
               >
-                <Background />
-                <Controls />
+                <Background color="#334155" gap={16} />
+                <Controls className="bg-surface border-border fill-primary" />
               </ReactFlow>
             )}
-          </CardContent>
-        </Card>
+        </div>
 
         {/* Right: Sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', overflowY: 'auto' }}>
+        <div className="w-80 flex flex-col gap-4 overflow-y-auto pr-4 pb-4">
           {analysis && analysis.circularDependencies && analysis.circularDependencies.length > 0 && (
-             <Card style={{ borderColor: 'var(--color-warning)' }}>
-               <CardHeader style={{ paddingBottom: '0.5rem' }}>
-                 <CardTitle style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', color: 'var(--color-warning)' }}>
-                   <AlertTriangle size={16} /> Circular Dependencies
-                 </CardTitle>
-               </CardHeader>
-               <CardContent>
-                 <ul style={{ fontSize: '0.875rem', paddingLeft: '1.25rem', color: 'var(--color-text-secondary)', margin: 0 }}>
+             <div className="panel border-l-4 border-warning/70">
+               <div className="px-3 py-2.5 border-b border-border bg-warning/5 flex items-center gap-2">
+                 <AlertTriangle size={14} className="text-warning" />
+                 <h3 className="text-sm font-semibold text-warning m-0">Circular Dependencies</h3>
+               </div>
+               <div className="p-3 bg-surface">
+                 <ul className="text-xs text-secondary pl-5 m-0 space-y-1.5 leading-relaxed font-mono">
                    {analysis.circularDependencies.map((c, i) => <li key={i}>{c}</li>)}
                  </ul>
-               </CardContent>
-             </Card>
+               </div>
+             </div>
           )}
 
-          <Card style={{ flex: 1 }}>
-            <CardHeader style={{ paddingBottom: '0.5rem' }}>
-              <CardTitle style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem' }}>
-                <Info size={16} /> Module Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="panel flex-1 flex flex-col">
+            <div className="px-3 py-2.5 border-b border-border bg-surface-hover flex items-center gap-2 shrink-0">
+              <Info size={14} className="text-accent" />
+              <h3 className="text-sm font-semibold text-primary m-0">Module Details</h3>
+            </div>
+            <div className="p-4 bg-surface flex-1 overflow-y-auto">
               {!selectedNode ? (
-                <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-                  Click a node in the graph to view details and ask the AI questions.
-                </p>
+                <div className="h-full flex flex-col items-center justify-center text-center text-muted">
+                  <Network size={32} className="opacity-30 mb-3" />
+                  <p className="text-xs">Click a node in the graph to view details and ask the AI questions.</p>
+                </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="flex flex-col gap-4">
                   <div>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600, wordBreak: 'break-all' }}>{selectedNode.name}</h3>
-                    <div style={{ display: 'inline-block', padding: '0.1rem 0.5rem', backgroundColor: 'var(--color-bg-secondary)', borderRadius: '4px', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                    <h3 className="text-sm font-mono font-semibold text-primary break-all m-0">{selectedNode.name}</h3>
+                    <div className="inline-block mt-2 px-1.5 py-0.5 bg-surface-hover text-secondary rounded text-[10px] tracking-wider uppercase border border-border">
                       {selectedNode.type}
                     </div>
                   </div>
 
                   <div>
-                    <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>Coupling Metrics</h4>
-                    <ul style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', paddingLeft: '1.25rem', margin: 0 }}>
+                    <h4 className="text-[11px] font-semibold text-secondary uppercase tracking-wider mb-2">Coupling Metrics</h4>
+                    <ul className="text-xs text-secondary pl-4 m-0 space-y-1.5">
                       {selectedNode.metrics?.map((m, i) => <li key={i}>{m}</li>)}
                     </ul>
                   </div>
 
-                  <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
-                    <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <MessageSquare size={14} /> Ask AI about this module
+                  <div className="mt-2 pt-4 border-t border-border">
+                    <h4 className="text-xs font-semibold text-primary flex items-center gap-2 mb-3">
+                      <MessageSquare size={14} className="text-accent" />
+                      Ask AI about this module
                     </h4>
                     <textarea 
                       value={explainQuestion}
                       onChange={(e) => setExplainQuestion(e.target.value)}
                       placeholder="e.g., Why does this module have high coupling?"
+                      className="input text-xs w-full resize-none mb-3"
                       rows={3}
-                      style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', fontSize: '0.875rem', marginBottom: '0.5rem' }}
                     />
                     <Button 
-                      variant="accent" 
+                      className="btn-primary w-full justify-center text-xs py-1.5"
                       onClick={handleExplain} 
                       disabled={!explainQuestion || isExplaining}
-                      style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
                     >
-                      {isExplaining ? 'Analyzing...' : 'Ask AI'}
+                      {isExplaining ? <><RefreshCw size={12} className="animate-spin mr-2" /> Analyzing...</> : 'Ask AI'}
                     </Button>
 
                     {explanation && (
-                      <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'var(--color-bg-secondary)', borderRadius: '4px', fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-                        <strong>AI Analysis:</strong><br />
+                      <div className="mt-4 p-3 bg-surface-hover border-l-2 border-accent text-xs text-secondary leading-relaxed">
+                        <strong className="text-primary block mb-1 font-semibold">AI Analysis:</strong>
                         {explanation}
                       </div>
                     )}
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

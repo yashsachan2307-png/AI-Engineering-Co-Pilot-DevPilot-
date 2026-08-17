@@ -7,6 +7,8 @@ import { CodeViewer } from './components/CodeViewer';
 import { CodeIntelligenceDashboard } from './components/CodeIntelligenceDashboard';
 import { CodeQualityDashboard } from './components/CodeQualityDashboard';
 import { CodeReviewPage } from './reviews/CodeReviewPage';
+import { Play, Loader2, Folder, BrainCircuit, ShieldCheck, MessageSquareCode } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 
 export function ProjectDetails() {
   const { id } = useParams();
@@ -92,119 +94,135 @@ export function ProjectDetails() {
     }
   };
 
-  const tabStyle = (isActive: boolean) => ({
-    padding: '8px 16px',
-    cursor: 'pointer',
-    borderBottom: isActive ? '2px solid var(--color-primary)' : '2px solid transparent',
-    color: isActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-    fontWeight: isActive ? 600 : 400
-  });
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexShrink: 0 }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Project Details: {id}</h1>
+      
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexShrink: 0 }}>
         <div>
-          <span style={{ marginRight: '1rem', fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
-            Ingestion Status: {status}
-          </span>
-          <button 
+          <h1 className="text-xl font-semibold text-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Folder className="text-accent" size={20} />
+            {id}
+          </h1>
+          <p className="text-secondary text-sm mt-1">Repository Workspace</p>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className="text-sm">
+            <span className="text-muted mr-2">Status:</span>
+            {status === 'COMPLETED' ? (
+              <span className="text-success font-medium flex items-center gap-1"><ShieldCheck size={14}/> Ready</span>
+            ) : status === 'QUEUED' || status === 'PROCESSING' ? (
+              <span className="text-warning font-medium flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Indexing</span>
+            ) : (
+              <span className="text-secondary font-medium">Unindexed</span>
+            )}
+          </div>
+          
+          <Button 
             onClick={startIngestion}
             disabled={status === 'QUEUED' || status === 'PROCESSING'}
-            className="btn-primary"
-            style={{ 
-              padding: '8px 16px', 
-              backgroundColor: status === 'QUEUED' || status === 'PROCESSING' ? '#666' : 'var(--color-primary)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: status === 'QUEUED' || status === 'PROCESSING' ? 'not-allowed' : 'pointer'
-            }}
+            className={status === 'QUEUED' || status === 'PROCESSING' ? 'btn-secondary' : 'btn-primary'}
           >
-            {status === 'QUEUED' || status === 'PROCESSING' ? 'Ingesting...' : 'Ingest Repository'}
-          </button>
+            {status === 'QUEUED' || status === 'PROCESSING' ? (
+              <><Loader2 size={14} className="animate-spin" /> Ingesting...</>
+            ) : (
+              <><Play size={14} /> Start Ingestion</>
+            )}
+          </Button>
         </div>
       </div>
 
+      {/* Tabs */}
       {status === 'COMPLETED' && (
-        <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid var(--color-border)', marginBottom: '20px', flexShrink: 0 }}>
-          <div style={tabStyle(activeTab === 'FILES')} onClick={() => setActiveTab('FILES')}>
-            File Explorer
-          </div>
-          <div style={tabStyle(activeTab === 'INTELLIGENCE')} onClick={() => setActiveTab('INTELLIGENCE')}>
-            Code Intelligence
-          </div>
-          <div style={tabStyle(activeTab === 'QUALITY')} onClick={() => setActiveTab('QUALITY')}>
-            Code Quality
-          </div>
-          <div style={tabStyle(activeTab === 'REVIEW')} onClick={() => setActiveTab('REVIEW')}>
-            AI Code Review
-          </div>
+        <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid var(--color-border)', marginBottom: '16px', flexShrink: 0 }}>
+          <button className={`tab ${activeTab === 'FILES' ? 'active' : ''}`} onClick={() => setActiveTab('FILES')}>
+            <Folder size={14} /> File Explorer
+          </button>
+          <button className={`tab ${activeTab === 'INTELLIGENCE' ? 'active' : ''}`} onClick={() => setActiveTab('INTELLIGENCE')}>
+            <BrainCircuit size={14} /> Code Intelligence
+          </button>
+          <button className={`tab ${activeTab === 'QUALITY' ? 'active' : ''}`} onClick={() => setActiveTab('QUALITY')}>
+            <ShieldCheck size={14} /> Code Quality
+          </button>
+          <button className={`tab ${activeTab === 'REVIEW' ? 'active' : ''}`} onClick={() => setActiveTab('REVIEW')}>
+            <MessageSquareCode size={14} /> AI Code Review
+          </button>
         </div>
       )}
       
-      {status === 'COMPLETED' && activeTab === 'FILES' && (
-        <div style={{ display: 'flex', flex: 1, gap: '20px', overflow: 'hidden' }}>
-          <div style={{ 
-            width: '250px', 
-            flexShrink: 0, 
-            borderRight: '1px solid var(--color-border)', 
-            paddingRight: '10px',
-            overflow: 'hidden'
-          }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '10px', textTransform: 'uppercase' }}>Explorer</h3>
-            <FileExplorer 
-              files={files} 
-              onFileSelect={handleFileSelect} 
-              selectedFileId={selectedFile?.id} 
-            />
-          </div>
-          <div style={{ flex: 1, overflow: 'hidden' }}>
-            {selectedFile ? (
-              loadingContent ? (
-                <div style={{ padding: '20px', color: 'var(--color-text-secondary)' }}>Loading content...</div>
-              ) : (
-                <CodeViewer 
-                  fileName={selectedFile.name} 
-                  language={selectedFile.language} 
-                  content={fileContent} 
-                />
-              )
-            ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-surface)', borderRadius: '8px' }}>
-                Select a file to view its content
+      {/* Content Area */}
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        {status === 'COMPLETED' && activeTab === 'FILES' && (
+          <div className="split-pane" style={{ flex: 1, gap: '1px', backgroundColor: 'var(--color-border)' }}>
+            <div style={{ width: '280px', backgroundColor: 'var(--color-surface)', flexShrink: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--color-border)', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Explorer
               </div>
-            )}
+              <div style={{ flex: 1, overflowY: 'auto' }}>
+                <FileExplorer 
+                  files={files} 
+                  onFileSelect={handleFileSelect} 
+                  selectedFileId={selectedFile?.id} 
+                />
+              </div>
+            </div>
+            
+            <div style={{ flex: 1, backgroundColor: 'var(--color-bg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              {selectedFile ? (
+                loadingContent ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-secondary)', gap: '8px' }}>
+                    <Loader2 size={16} className="animate-spin" /> Loading editor...
+                  </div>
+                ) : (
+                  <CodeViewer 
+                    fileName={selectedFile.name} 
+                    language={selectedFile.language} 
+                    content={fileContent} 
+                  />
+                )
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-muted)' }}>
+                  Select a file from the explorer to view its contents
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {status === 'COMPLETED' && activeTab === 'INTELLIGENCE' && (
-        <CodeIntelligenceDashboard repositoryId={id || ''} />
-      )}
+        {status === 'COMPLETED' && activeTab === 'INTELLIGENCE' && (
+          <CodeIntelligenceDashboard repositoryId={id || ''} />
+        )}
 
-      {status === 'COMPLETED' && activeTab === 'QUALITY' && (
-        <CodeQualityDashboard repositoryId={id || ''} />
-      )}
+        {status === 'COMPLETED' && activeTab === 'QUALITY' && (
+          <CodeQualityDashboard repositoryId={id || ''} />
+        )}
 
-      {status === 'COMPLETED' && activeTab === 'REVIEW' && (
-        <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#f9fafb' }}>
-          <CodeReviewPage />
-        </div>
-      )}
-      
-      {status !== 'COMPLETED' && status !== 'NONE' && (
-        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-surface)', borderRadius: '8px' }}>
-          <div style={{ fontSize: '1.2rem', marginBottom: '10px' }}>Ingestion in Progress</div>
-          <p>We are downloading and parsing the repository files. This may take a few moments.</p>
-        </div>
-      )}
-      
-      {status === 'NONE' && (
-        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-surface)', borderRadius: '8px' }}>
-          <p>This repository hasn't been ingested yet. Click "Ingest Repository" to start.</p>
-        </div>
-      )}
+        {status === 'COMPLETED' && activeTab === 'REVIEW' && (
+          <div style={{ flex: 1, overflow: 'hidden', backgroundColor: 'var(--color-bg)' }}>
+            <CodeReviewPage />
+          </div>
+        )}
+        
+        {status !== 'COMPLETED' && status !== 'NONE' && (
+          <div className="card" style={{ maxWidth: '400px', margin: '40px auto', textAlign: 'center', padding: '32px' }}>
+            <Loader2 size={32} className="animate-spin text-accent" style={{ margin: '0 auto 16px' }} />
+            <h3 className="text-primary font-semibold text-lg mb-2">Ingestion in Progress</h3>
+            <p className="text-secondary text-sm">We are downloading and parsing the repository files. This may take a few moments.</p>
+          </div>
+        )}
+        
+        {status === 'NONE' && (
+          <div className="card" style={{ maxWidth: '400px', margin: '40px auto', textAlign: 'center', padding: '32px' }}>
+            <Folder size={32} className="text-muted" style={{ margin: '0 auto 16px' }} />
+            <h3 className="text-primary font-semibold text-lg mb-2">Repository Not Indexed</h3>
+            <p className="text-secondary text-sm mb-6">This repository hasn't been ingested yet. Start the ingestion process to analyze the code.</p>
+            <Button onClick={startIngestion} className="btn-primary w-full justify-center">
+              <Play size={14} /> Start Ingestion
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

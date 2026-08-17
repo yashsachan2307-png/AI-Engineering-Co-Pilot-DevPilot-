@@ -92,33 +92,21 @@ export function FileExplorer({ files, onFileSelect, selectedFileId }: FileExplor
               onFileSelect(node.file);
             }
           }}
+          className={`flex items-center cursor-pointer select-none transition-colors duration-100 ${isSelected ? 'bg-[var(--color-bg)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text-primary)]'}`}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: `6px 8px 6px ${8 + depth * 16}px`,
-            cursor: 'pointer',
-            color: isSelected ? 'var(--color-primary)' : 'var(--color-text)',
-            backgroundColor: isSelected ? 'var(--color-surface-hover)' : 'transparent',
-            borderRadius: '4px',
-            fontSize: '0.9rem',
-            userSelect: 'none'
-          }}
-          onMouseEnter={e => {
-            if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
-          }}
-          onMouseLeave={e => {
-            if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
+            padding: `4px 8px 4px ${8 + depth * 12}px`,
+            fontSize: '12px',
           }}
         >
           {node.isDirectory ? (
             <>
-              {isExpanded ? <ChevronDown size={14} style={{ marginRight: '6px' }} /> : <ChevronRight size={14} style={{ marginRight: '6px' }} />}
-              <Folder size={14} style={{ marginRight: '6px', color: 'var(--color-text-secondary)' }} />
+              {isExpanded ? <ChevronDown size={14} className="mr-1 opacity-70" /> : <ChevronRight size={14} className="mr-1 opacity-70" />}
+              <Folder size={14} className="mr-1.5 text-accent opacity-80" />
             </>
           ) : (
             <>
-              <span style={{ width: '20px', display: 'inline-block' }}></span>
-              <File size={14} style={{ marginRight: '6px', color: 'var(--color-text-secondary)' }} />
+              <span style={{ width: '18px', display: 'inline-block' }}></span>
+              <File size={14} className="mr-1.5 opacity-60" />
             </>
           )}
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -141,9 +129,9 @@ export function FileExplorer({ files, onFileSelect, selectedFileId }: FileExplor
   };
 
   return (
-    <div style={{ padding: '10px 0', overflowY: 'auto', height: '100%' }}>
+    <div style={{ padding: '8px 0', overflowY: 'auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {files.length === 0 ? (
-        <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+        <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '12px' }}>
           No files found
         </div>
       ) : (
