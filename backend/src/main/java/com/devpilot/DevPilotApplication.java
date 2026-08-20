@@ -15,27 +15,36 @@ public class DevPilotApplication {
 
     public static void main(String[] args) {
         String dbUrl = System.getenv("DATABASE_URL");
-        if (dbUrl != null && dbUrl.startsWith("postgres://")) {
+        if (dbUrl != null && !dbUrl.startsWith("jdbc:")) {
             try {
                 URI uri = new URI(dbUrl);
-                String host = uri.getHost();
-                int port = uri.getPort() != -1 ? uri.getPort() : 5432;
-                String path = uri.getPath();
+                String scheme = uri.getScheme();
                 
-                String newUrl = "jdbc:postgresql://" + host + ":" + port + path;
-                if (uri.getQuery() != null) {
-                    newUrl += "?" + uri.getQuery();
-                }
-                
-                System.setProperty("spring.datasource.url", newUrl);
-                
-                if (uri.getUserInfo() != null) {
-                    String[] userInfo = uri.getUserInfo().split(":");
-                    if (userInfo.length > 0) {
-                        System.setProperty("spring.datasource.username", userInfo[0]);
+                if (scheme != null && scheme.startsWith("postgres")) {
+                    String host = uri.getHost();
+                    int port = uri.getPort() != -1 ? uri.getPort() : 5432;
+                    String path = uri.getPath();
+                    
+                    String newUrl = "jdbc:postgresql://" + host + ":" + port + path;
+                    if (uri.getQuery() != null) {
+                        newUrl += "?" + uri.getQuery();
+                        if (!newUrl.contains("sslmode=")) {
+                            newUrl += "&sslmode=require";
+                        }
+                    } else {
+                        newUrl += "?sslmode=require";
                     }
-                    if (userInfo.length > 1) {
-                        System.setProperty("spring.datasource.password", userInfo[1]);
+                    
+                    System.setProperty("spring.datasource.url", newUrl);
+                    
+                    if (uri.getUserInfo() != null) {
+                        String[] userInfo = uri.getUserInfo().split(":");
+                        if (userInfo.length > 0) {
+                            System.setProperty("spring.datasource.username", userInfo[0]);
+                        }
+                        if (userInfo.length > 1) {
+                            System.setProperty("spring.datasource.password", userInfo[1]);
+                        }
                     }
                 }
             } catch (URISyntaxException e) {
