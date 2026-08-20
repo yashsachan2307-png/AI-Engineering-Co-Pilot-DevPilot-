@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { githubService, GitHubRepository } from '../../services/githubService';
+import { Search, X, FolderGit2, Download } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 
 export const RepositorySelection: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [repositories, setRepositories] = useState<GitHubRepository[]>([]);
@@ -38,57 +40,74 @@ export const RepositorySelection: React.FC<{ onClose: () => void }> = ({ onClose
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl">
-        <div className="p-6 border-b border-[var(--border)] flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold">Import Repository</h2>
-            <p className="text-[var(--text-secondary)] text-sm">Select a repository from your GitHub account</p>
+    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+      <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', width: '100%', maxWidth: '800px', maxHeight: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
+        
+        {/* Header */}
+        <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--color-bg)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <FolderGit2 size={18} style={{ color: 'var(--color-accent)' }} />
+            <div>
+              <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>IMPORT_REPOSITORY</h2>
+              <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0', fontFamily: 'var(--font-code)' }}>Select a repository from your GitHub account</p>
+            </div>
           </div>
-          <button onClick={onClose} className="text-[var(--text-secondary)] hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <button 
+            onClick={onClose} 
+            style={{ background: 'transparent', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '4px' }}
+          >
+            <X size={18} />
           </button>
         </div>
 
-        <div className="p-6 flex-1 overflow-hidden flex flex-col">
-          {error && <div className="text-red-500 mb-4">{error}</div>}
+        {/* Content */}
+        <div style={{ padding: '24px', flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {error && <div style={{ color: 'var(--color-error)', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '12px', borderRadius: 'var(--radius-sm)', fontSize: '12px', fontFamily: 'var(--font-code)', marginBottom: '16px' }}>[ERROR]: {error}</div>}
           
-          <input 
-            type="text" 
-            placeholder="Search repositories..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[var(--bg-input)] border border-[var(--border)] rounded-lg px-4 py-2 mb-4 text-white focus:outline-none focus:border-[var(--accent-primary)]"
-          />
+          <div style={{ position: 'relative', marginBottom: '16px' }}>
+            <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
+            <input 
+              type="text" 
+              placeholder="Search repositories..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ width: '100%', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px 10px 36px', color: 'var(--color-text-primary)', fontSize: '12px', fontFamily: 'var(--font-code)', outline: 'none', boxSizing: 'border-box' }}
+            />
+          </div>
 
-          <div className="overflow-y-auto flex-1 pr-2 space-y-2">
+          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {loading ? (
-              <div className="text-center py-8 text-[var(--text-secondary)]">Loading repositories...</div>
+              <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--color-text-secondary)', fontSize: '12px', fontFamily: 'var(--font-code)' }}>
+                [LOADING_REPOSITORIES...]
+              </div>
             ) : filteredRepos.length === 0 ? (
-              <div className="text-center py-8 text-[var(--text-secondary)]">No repositories found.</div>
+              <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--color-text-secondary)', fontSize: '12px', fontFamily: 'var(--font-code)' }}>
+                [NO_REPOSITORIES_FOUND]
+              </div>
             ) : (
               filteredRepos.map(repo => (
-                <div key={repo.id} className="flex justify-between items-center p-4 border border-[var(--border)] rounded-lg hover:border-[var(--border-hover)] transition-colors">
-                  <div className="overflow-hidden">
-                    <div className="font-medium flex items-center gap-2">
-                      <span className="truncate">{repo.full_name}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border)]">
+                <div key={repo.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg)' }}>
+                  <div style={{ overflow: 'hidden', flex: 1, paddingRight: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{repo.full_name}</span>
+                      <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)', textTransform: 'uppercase', fontFamily: 'var(--font-code)' }}>
                         {repo.visibility}
                       </span>
                     </div>
-                    {repo.description && <p className="text-sm text-[var(--text-secondary)] truncate mt-1">{repo.description}</p>}
-                    <div className="text-xs text-[var(--text-secondary)] flex gap-4 mt-2">
-                      {repo.language && <span>{repo.language}</span>}
-                      <span>Updated {new Date(repo.updated_at).toLocaleDateString()}</span>
+                    {repo.description && <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '8px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontFamily: 'var(--font-code)' }}>{repo.description}</p>}
+                    <div style={{ display: 'flex', gap: '16px', marginTop: '12px', fontSize: '10px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-code)', textTransform: 'uppercase' }}>
+                      {repo.language && <span>LANG: {repo.language}</span>}
+                      <span>UPDATED: {new Date(repo.updated_at).toLocaleDateString()}</span>
                     </div>
                   </div>
-                  <button 
+                  <Button 
                     onClick={() => handleImport(repo.id)}
                     disabled={importing === repo.id}
-                    className="ml-4 px-4 py-2 bg-[var(--bg-hover)] text-white text-sm font-medium rounded-lg border border-[var(--border)] hover:bg-[var(--accent-primary)] hover:border-transparent transition-all disabled:opacity-50"
+                    className="btn-primary"
+                    style={{ fontSize: '11px', fontFamily: 'var(--font-code)', padding: '6px 12px', flexShrink: 0 }}
                   >
-                    {importing === repo.id ? 'Importing...' : 'Import'}
-                  </button>
+                    {importing === repo.id ? '[IMPORTING...]' : <><Download size={12} style={{ marginRight: '6px' }} /> IMPORT</>}
+                  </Button>
                 </div>
               ))
             )}

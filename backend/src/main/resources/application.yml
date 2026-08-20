@@ -22,6 +22,8 @@ spring:
       url: ${REDIS_URL:redis://localhost:6379}
 
 devpilot:
+  cors:
+    allowed-origins: ${FRONTEND_URL:http://localhost:5173}
   security:
     jwt:
       secret: ${JWT_SECRET:8f75b7b620023023ebc9c3e2e0fb5219597c2763260840b15b31f750b38ef0fae929f0ef7491b8a5316dbb44f24df926c4f74d0e82c5f1345ff5b3f115a97576}
@@ -36,7 +38,7 @@ devpilot:
     secret-key: ${ENCRYPTION_KEY:12345678901234567890123456789012} # Must be exactly 32 bytes for AES-256
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 management:
   endpoints:

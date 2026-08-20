@@ -5,8 +5,10 @@ import { Button } from '../../components/ui/Button';
 import { 
   ShieldAlert, ShieldCheck, AlertTriangle, 
   AlertCircle, Info, RefreshCw, XCircle, 
-  CheckCircle, Play, Eye, FolderGit2
+  CheckCircle, Play, Eye, FolderGit2,
+  TerminalSquare
 } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -32,7 +34,7 @@ export const Security: React.FC = () => {
 
   const fetchRepositories = async () => {
     try {
-      const res = await fetch('/api/repositories', {
+      const res = await fetch(`${API_BASE_URL}/api/repositories`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
@@ -112,81 +114,100 @@ export const Security: React.FC = () => {
 
   if (!currentRepositoryId) {
     return (
-      <div className="flex h-full items-center justify-center bg-bg text-secondary flex-col gap-4">
-        <ShieldAlert className="w-16 h-16 text-muted" />
-        <p className="text-sm">No repository selected. Please ensure you have imported a repository.</p>
+      <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-secondary)', flexDirection: 'column', gap: '16px' }}>
+        <ShieldAlert size={64} className="text-muted" style={{ opacity: 0.5 }} />
+        <p style={{ fontSize: '13px', fontFamily: 'var(--font-code)' }}>NO_REPOSITORY_CONFIGURED</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 h-full bg-bg overflow-hidden">
-      <div className="panel border-b-0 border-l-0 border-r-0 rounded-none flex justify-between items-center px-4 py-3 shrink-0 bg-surface">
-        <div>
-          <h1 className="text-sm font-semibold text-primary flex items-center gap-2 m-0">
-            <ShieldAlert size={16} className="text-error" />
-            Security Analysis
-          </h1>
-          <p className="text-xs text-secondary mt-1 m-0">
-            Scan and remediate security vulnerabilities in your codebase.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1 bg-surface-hover border border-border rounded-sm">
-            <FolderGit2 size={14} className="text-muted" />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', backgroundColor: 'var(--color-bg)' }}>
+      {/* Top Context Bar */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '12px 24px', 
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        flexShrink: 0 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-error)', fontFamily: 'var(--font-code)', fontSize: '13px' }}>
+            <TerminalSquare size={16} />
+            <span>SECURITY_ANALYZER</span>
+          </div>
+          
+          <div style={{ height: 16, width: 1, backgroundColor: 'var(--color-border)' }} />
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg)' }}>
+            <FolderGit2 size={12} className="text-muted" />
             <select
               value={currentRepositoryId || ''}
               onChange={(e) => setCurrentRepositoryId(Number(e.target.value))}
-              className="select text-xs py-0.5 border-none bg-transparent pl-0 focus:ring-0 w-48"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--color-text-primary)',
+                fontFamily: 'var(--font-code)',
+                fontSize: '11px',
+                outline: 'none',
+                cursor: 'pointer',
+                width: '180px',
+                textOverflow: 'ellipsis'
+              }}
             >
               {repositories.map(r => (
-                <option key={r.id} value={r.id} className="bg-surface text-primary">
+                <option key={r.id} value={r.id} style={{ background: 'var(--color-surface)' }}>
                   {r.name}
                 </option>
               ))}
             </select>
           </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Button 
-            className="btn-primary text-xs py-1"
+            className="btn-primary"
+            style={{ fontSize: '11px', fontFamily: 'var(--font-code)', padding: '6px 12px' }}
             onClick={handleScan}
             disabled={loading}
           >
             {loading ? <RefreshCw size={14} className="animate-spin mr-1.5" /> : <Play size={14} className="mr-1.5" />}
-            Scan
+            EXECUTE_SCAN
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-1 gap-4 overflow-hidden">
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Sidebar: Findings List */}
-        <div className="panel w-1/3 flex flex-col shrink-0 bg-surface border-l-0 border-r border-t border-b-0 rounded-none">
+        <div style={{ width: '33%', display: 'flex', flexDirection: 'column', flexShrink: 0, backgroundColor: 'var(--color-surface)', borderRight: '1px solid var(--color-border)' }}>
           {/* Severity Summary */}
-          <div className="flex p-3 gap-2 border-b border-border bg-surface-hover shrink-0">
-            <div className="flex-1 bg-error/10 border border-error/20 rounded p-2 text-center">
-              <div className="text-[10px] text-error uppercase font-bold tracking-wider">Critical</div>
-              <div className="text-lg text-primary font-mono mt-1">{critical}</div>
+          <div style={{ display: 'flex', padding: '12px', gap: '8px', borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface-hover)', flexShrink: 0 }}>
+            <div style={{ flex: 1, backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: 'var(--radius-sm)', padding: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'var(--color-error)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', fontFamily: 'var(--font-code)' }}>CRITICAL</div>
+              <div style={{ fontSize: '16px', color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)', marginTop: '4px' }}>{critical}</div>
             </div>
-            <div className="flex-1 bg-warning/10 border border-warning/20 rounded p-2 text-center">
-              <div className="text-[10px] text-warning uppercase font-bold tracking-wider">High</div>
-              <div className="text-lg text-primary font-mono mt-1">{high}</div>
+            <div style={{ flex: 1, backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.2)', borderRadius: 'var(--radius-sm)', padding: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'var(--color-warning)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', fontFamily: 'var(--font-code)' }}>HIGH</div>
+              <div style={{ fontSize: '16px', color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)', marginTop: '4px' }}>{high}</div>
             </div>
-            <div className="flex-1 bg-accent/10 border border-accent/20 rounded p-2 text-center">
-              <div className="text-[10px] text-accent uppercase font-bold tracking-wider">Med</div>
-              <div className="text-lg text-primary font-mono mt-1">{medium}</div>
+            <div style={{ flex: 1, backgroundColor: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: 'var(--radius-sm)', padding: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'var(--color-accent)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', fontFamily: 'var(--font-code)' }}>MED</div>
+              <div style={{ fontSize: '16px', color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)', marginTop: '4px' }}>{medium}</div>
             </div>
-            <div className="flex-1 bg-success/10 border border-success/20 rounded p-2 text-center">
-              <div className="text-[10px] text-success uppercase font-bold tracking-wider">Low</div>
-              <div className="text-lg text-primary font-mono mt-1">{low}</div>
+            <div style={{ flex: 1, backgroundColor: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.2)', borderRadius: 'var(--radius-sm)', padding: '8px', textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'var(--color-success)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', fontFamily: 'var(--font-code)' }}>LOW</div>
+              <div style={{ fontSize: '16px', color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)', marginTop: '4px' }}>{low}</div>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div style={{ flex: 1, overflowY: 'auto' }}>
             {findings.length === 0 && !loading && (
-              <div className="p-8 text-center text-muted flex flex-col items-center">
-                <ShieldCheck size={48} className="text-success/50 mb-3" />
-                <p className="text-sm text-primary">No security findings.</p>
-                <p className="text-xs mt-1">Run a scan to check the repository.</p>
+              <div style={{ padding: '32px', textAlign: 'center', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <ShieldCheck size={48} style={{ opacity: 0.5, marginBottom: '12px', color: 'var(--color-success)' }} />
+                <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }}>NO_SECURITY_FINDINGS</p>
+                <p style={{ fontSize: '11px', marginTop: '4px', fontFamily: 'var(--font-code)' }}>Run a scan to check the repository.</p>
               </div>
             )}
             
@@ -194,21 +215,29 @@ export const Security: React.FC = () => {
               <div 
                 key={finding.id}
                 onClick={() => setSelectedFinding(finding)}
-                className={`p-3 border-b border-border cursor-pointer transition-colors ${selectedFinding?.id === finding.id ? 'bg-surface-hover border-l-2 border-l-accent' : 'hover:bg-surface-hover border-l-2 border-l-transparent'} ${finding.status !== 'NEW' ? 'opacity-60' : ''}`}
+                style={{
+                  padding: '12px',
+                  borderBottom: '1px solid var(--color-border)',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  backgroundColor: selectedFinding?.id === finding.id ? 'var(--color-surface-hover)' : 'transparent',
+                  borderLeft: `2px solid ${selectedFinding?.id === finding.id ? 'var(--color-accent)' : 'transparent'}`,
+                  opacity: finding.status !== 'NEW' ? 0.6 : 1
+                }}
               >
-                <div className="flex items-start justify-between">
-                  <div className="text-xs font-semibold text-primary truncate mr-2">{finding.ruleId}</div>
-                  {finding.severity === 'CRITICAL' && <AlertTriangle size={14} className="text-error shrink-0" />}
-                  {finding.severity === 'HIGH' && <AlertTriangle size={14} className="text-warning shrink-0" />}
-                  {finding.severity === 'MEDIUM' && <AlertCircle size={14} className="text-accent shrink-0" />}
-                  {finding.severity === 'LOW' && <Info size={14} className="text-success shrink-0" />}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginRight: '8px', fontFamily: 'var(--font-code)' }}>{finding.ruleId}</div>
+                  {finding.severity === 'CRITICAL' && <AlertTriangle size={14} className="text-error" style={{ flexShrink: 0 }} />}
+                  {finding.severity === 'HIGH' && <AlertTriangle size={14} className="text-warning" style={{ flexShrink: 0 }} />}
+                  {finding.severity === 'MEDIUM' && <AlertCircle size={14} className="text-accent" style={{ flexShrink: 0 }} />}
+                  {finding.severity === 'LOW' && <Info size={14} className="text-success" style={{ flexShrink: 0 }} />}
                 </div>
-                <div className="text-[10px] text-secondary mt-1">Line {finding.lineNumber ?? 'N/A'}</div>
-                <div className="text-[10px] font-mono text-muted mt-2 truncate bg-[#0f172a] p-1.5 rounded border border-border">
+                <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginTop: '4px', fontFamily: 'var(--font-code)' }}>LINE {finding.lineNumber ?? 'N/A'}</div>
+                <div style={{ fontSize: '10px', fontFamily: 'var(--font-code)', color: 'var(--color-text-muted)', marginTop: '8px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', backgroundColor: 'var(--color-bg)', padding: '6px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
                   {finding.evidence}
                 </div>
                 {finding.status !== 'NEW' && (
-                  <div className="text-[10px] text-success mt-2 font-bold tracking-wider uppercase">{finding.status}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--color-success)', marginTop: '8px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', fontFamily: 'var(--font-code)' }}>{finding.status}</div>
                 )}
               </div>
             ))}
@@ -216,43 +245,45 @@ export const Security: React.FC = () => {
         </div>
 
         {/* Main Content: Finding Details */}
-        <div className="flex-1 overflow-y-auto pr-4 pb-4">
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
           {selectedFinding ? (
-            <div className="flex flex-col gap-4">
-              <div className="panel bg-surface">
-                <div className="px-4 py-3 border-b border-border flex justify-between items-start gap-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
                   <div>
-                    <h1 className="text-base font-bold text-primary m-0">{selectedFinding.ruleId}</h1>
-                    <p className="text-xs text-secondary mt-1 m-0">Category: {selectedFinding.category}</p>
+                    <h1 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>{selectedFinding.ruleId}</h1>
+                    <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '4px', margin: 0, fontFamily: 'var(--font-code)' }}>CATEGORY: {selectedFinding.category}</p>
                   </div>
-                  <div className="flex gap-2 shrink-0">
+                  <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                     <Button 
-                      className="btn-secondary text-[11px] px-2.5 py-1 h-7 border-success text-success bg-success/10"
+                      className="btn-secondary"
+                      style={{ fontSize: '10px', fontFamily: 'var(--font-code)', padding: '4px 10px', height: '28px', backgroundColor: 'rgba(34, 197, 94, 0.1)', borderColor: 'var(--color-success)', color: 'var(--color-success)' }}
                       onClick={() => handleUpdateStatus('REVIEWED')}
                     >
-                      <CheckCircle size={12} className="mr-1" /> Reviewed
+                      <CheckCircle size={12} style={{ marginRight: '4px' }} /> REVIEWED
                     </Button>
                     <Button 
-                      className="btn-secondary text-[11px] px-2.5 py-1 h-7"
+                      className="btn-secondary"
+                      style={{ fontSize: '10px', fontFamily: 'var(--font-code)', padding: '4px 10px', height: '28px' }}
                       onClick={() => handleUpdateStatus('DISMISSED')}
                     >
-                      <XCircle size={12} className="mr-1" /> Dismiss
+                      <XCircle size={12} style={{ marginRight: '4px' }} /> DISMISS
                     </Button>
                   </div>
                 </div>
                 
-                <div className="p-4 bg-surface">
-                  <div className="bg-[#0f172a] border border-border rounded-lg overflow-hidden">
-                    <div className="flex justify-between items-center px-4 py-2 border-b border-border/50 bg-[#0f172a]/50">
-                      <h3 className="text-[11px] font-semibold text-secondary m-0">Masked Evidence (Line {selectedFinding.lineNumber ?? 'N/A'})</h3>
-                      <span className="text-[10px] bg-error/20 text-error px-1.5 py-0.5 rounded border border-error/30 tracking-wider">
-                        Secrets masked
+                <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)' }}>
+                  <div style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
+                      <h3 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-secondary)', margin: 0, fontFamily: 'var(--font-code)' }}>MASKED_EVIDENCE (LINE {selectedFinding.lineNumber ?? 'N/A'})</h3>
+                      <span style={{ fontSize: '10px', backgroundColor: 'rgba(239, 68, 68, 0.2)', color: 'var(--color-error)', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(239, 68, 68, 0.3)', letterSpacing: '0.05em', fontFamily: 'var(--font-code)' }}>
+                        SECRETS_MASKED
                       </span>
                     </div>
                     <SyntaxHighlighter
                       language="java"
                       style={vscDarkPlus}
-                      customStyle={{ margin: 0, padding: '16px', fontSize: '11px', background: 'transparent' }}
+                      customStyle={{ margin: 0, padding: '16px', fontSize: '11px', fontFamily: 'var(--font-code)', background: 'transparent' }}
                     >
                       {selectedFinding.evidence}
                     </SyntaxHighlighter>
@@ -260,34 +291,35 @@ export const Security: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center px-1">
-                <h3 className="text-sm font-semibold text-primary m-0">Analysis & Remediation</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
+                <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>ANALYSIS_AND_REMEDIATION</h3>
                 <Button
-                  className="btn-primary text-xs py-1"
+                  className="btn-primary"
+                  style={{ fontSize: '11px', fontFamily: 'var(--font-code)', padding: '6px 12px' }}
                   onClick={handleExplain}
                   disabled={explaining}
                 >
                   {explaining ? <RefreshCw size={14} className="animate-spin mr-1.5" /> : <Eye size={14} className="mr-1.5" />}
-                  Ask AI to Analyze
+                  EXECUTE_AI_ANALYSIS
                 </Button>
               </div>
               
-              <div className="flex flex-col gap-4">
-                <div className="panel p-4 bg-surface">
-                  <h4 className="text-[11px] font-semibold text-secondary uppercase tracking-wider mb-2 m-0">Explanation</h4>
-                  <p className="text-xs text-primary whitespace-pre-wrap leading-relaxed m-0">{selectedFinding.explanation}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ padding: '16px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)' }}>
+                  <h4 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', margin: 0, fontFamily: 'var(--font-code)' }}>EXPLANATION</h4>
+                  <p style={{ fontSize: '12px', color: 'var(--color-text-primary)', whiteSpace: 'pre-wrap', lineHeight: '1.6', margin: '8px 0 0 0', fontFamily: 'var(--font-code)' }}>{selectedFinding.explanation}</p>
                 </div>
                 
-                <div className="panel p-4 bg-accent/5 border-accent/30">
-                  <h4 className="text-[11px] font-semibold text-accent uppercase tracking-wider mb-2 m-0">Recommendation</h4>
-                  <p className="text-xs text-primary whitespace-pre-wrap leading-relaxed m-0">{selectedFinding.recommendation}</p>
+                <div style={{ padding: '16px', backgroundColor: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: 'var(--radius-sm)' }}>
+                  <h4 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', margin: 0, fontFamily: 'var(--font-code)' }}>RECOMMENDATION</h4>
+                  <p style={{ fontSize: '12px', color: 'var(--color-text-primary)', whiteSpace: 'pre-wrap', lineHeight: '1.6', margin: '8px 0 0 0', fontFamily: 'var(--font-code)' }}>{selectedFinding.recommendation}</p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-muted border border-dashed border-border rounded-lg bg-surface/50 min-h-[400px]">
-              <ShieldAlert size={48} className="opacity-30 mb-4" />
-              <p className="text-sm text-primary">Select a finding to view details</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-muted)', border: '1px dashed var(--color-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-surface)', opacity: 0.8, minHeight: '400px' }}>
+              <ShieldAlert size={48} style={{ opacity: 0.3, marginBottom: '16px' }} />
+              <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }}>SELECT_FINDING_TO_INSPECT</p>
             </div>
           )}
         </div>

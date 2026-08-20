@@ -3,11 +3,12 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { FileExplorer, RepositoryFile } from './components/FileExplorer';
 import { CodeViewer } from './components/CodeViewer';
+import { API_BASE_URL } from '../../services/api';
 
 import { CodeIntelligenceDashboard } from './components/CodeIntelligenceDashboard';
 import { CodeQualityDashboard } from './components/CodeQualityDashboard';
 import { CodeReviewPage } from './reviews/CodeReviewPage';
-import { Play, Loader2, Folder, BrainCircuit, ShieldCheck, MessageSquareCode } from 'lucide-react';
+import { Play, Loader2, FolderGit2, BrainCircuit, ShieldCheck, MessageSquareCode, TerminalSquare, SearchCode } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
 export function ProjectDetails() {
@@ -30,7 +31,7 @@ export function ProjectDetails() {
   const fetchStatus = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${id}/ingestion-status`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${id}/ingestion-status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -48,7 +49,7 @@ export function ProjectDetails() {
   const fetchFiles = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${id}/files`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${id}/files`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -63,7 +64,7 @@ export function ProjectDetails() {
   const startIngestion = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${id}/ingest`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${id}/ingest`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -80,7 +81,7 @@ export function ProjectDetails() {
     setLoadingContent(true);
     setFileContent('');
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${id}/files/${file.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${id}/files/${file.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -95,69 +96,125 @@ export function ProjectDetails() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', backgroundColor: 'var(--color-bg)' }}>
       
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexShrink: 0 }}>
-        <div>
-          <h1 className="text-xl font-semibold text-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Folder className="text-accent" size={20} />
+      {/* Top Context Bar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 24px', backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-accent)', fontFamily: 'var(--font-code)', fontSize: '13px' }}>
+            <FolderGit2 size={16} />
+            <span>WORKSPACE_ROOT</span>
+          </div>
+          
+          <div style={{ height: 16, width: 1, backgroundColor: 'var(--color-border)' }} />
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)', fontSize: '12px' }}>
             {id}
-          </h1>
-          <p className="text-secondary text-sm mt-1">Repository Workspace</p>
+          </div>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div className="text-sm">
-            <span className="text-muted mr-2">Status:</span>
+          <div style={{ fontFamily: 'var(--font-code)', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: 'var(--color-text-muted)' }}>STATUS:</span>
             {status === 'COMPLETED' ? (
-              <span className="text-success font-medium flex items-center gap-1"><ShieldCheck size={14}/> Ready</span>
+              <span className="text-success" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12}/> [READY]</span>
             ) : status === 'QUEUED' || status === 'PROCESSING' ? (
-              <span className="text-warning font-medium flex items-center gap-1"><Loader2 size={14} className="animate-spin" /> Indexing</span>
+              <span className="text-warning" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Loader2 size={12} className="animate-spin" /> [INDEXING]</span>
             ) : (
-              <span className="text-secondary font-medium">Unindexed</span>
+              <span className="text-secondary">[UNINDEXED]</span>
             )}
           </div>
           
           <Button 
             onClick={startIngestion}
             disabled={status === 'QUEUED' || status === 'PROCESSING'}
-            className={status === 'QUEUED' || status === 'PROCESSING' ? 'btn-secondary' : 'btn-primary'}
+            className={status === 'QUEUED' || status === 'PROCESSING' ? 'btn-ghost' : 'btn-primary'}
+            style={{ fontFamily: 'var(--font-code)', fontSize: '11px' }}
           >
             {status === 'QUEUED' || status === 'PROCESSING' ? (
-              <><Loader2 size={14} className="animate-spin" /> Ingesting...</>
+              <><Loader2 size={12} className="animate-spin" /> PROCESSING...</>
             ) : (
-              <><Play size={14} /> Start Ingestion</>
+              <><Play size={12} /> INIT_INGESTION</>
             )}
           </Button>
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs / Tools */}
       {status === 'COMPLETED' && (
-        <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid var(--color-border)', marginBottom: '16px', flexShrink: 0 }}>
-          <button className={`tab ${activeTab === 'FILES' ? 'active' : ''}`} onClick={() => setActiveTab('FILES')}>
-            <Folder size={14} /> File Explorer
+        <div style={{ display: 'flex', gap: '4px', borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', padding: '0 16px', flexShrink: 0 }}>
+          <button 
+            onClick={() => setActiveTab('FILES')}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', 
+              backgroundColor: activeTab === 'FILES' ? 'var(--color-bg)' : 'transparent',
+              borderTop: `2px solid ${activeTab === 'FILES' ? 'var(--color-accent)' : 'transparent'}`,
+              color: activeTab === 'FILES' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+              borderRight: '1px solid var(--color-border)',
+              borderLeft: '1px solid var(--color-border)',
+              borderBottom: activeTab === 'FILES' ? 'none' : '1px solid var(--color-border)',
+              fontFamily: 'var(--font-code)', fontSize: '11px', cursor: 'pointer', outline: 'none'
+            }}
+            className="hover:text-[var(--color-text-primary)]"
+          >
+            <FolderGit2 size={14} /> FILES.EXE
           </button>
-          <button className={`tab ${activeTab === 'INTELLIGENCE' ? 'active' : ''}`} onClick={() => setActiveTab('INTELLIGENCE')}>
-            <BrainCircuit size={14} /> Code Intelligence
+          <button 
+            onClick={() => setActiveTab('INTELLIGENCE')}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', 
+              backgroundColor: activeTab === 'INTELLIGENCE' ? 'var(--color-bg)' : 'transparent',
+              borderTop: `2px solid ${activeTab === 'INTELLIGENCE' ? 'var(--color-accent)' : 'transparent'}`,
+              color: activeTab === 'INTELLIGENCE' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+              borderRight: '1px solid var(--color-border)',
+              borderBottom: activeTab === 'INTELLIGENCE' ? 'none' : '1px solid var(--color-border)',
+              fontFamily: 'var(--font-code)', fontSize: '11px', cursor: 'pointer', outline: 'none'
+            }}
+            className="hover:text-[var(--color-text-primary)]"
+          >
+            <BrainCircuit size={14} /> AST_ANALYSIS
           </button>
-          <button className={`tab ${activeTab === 'QUALITY' ? 'active' : ''}`} onClick={() => setActiveTab('QUALITY')}>
-            <ShieldCheck size={14} /> Code Quality
+          <button 
+            onClick={() => setActiveTab('QUALITY')}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', 
+              backgroundColor: activeTab === 'QUALITY' ? 'var(--color-bg)' : 'transparent',
+              borderTop: `2px solid ${activeTab === 'QUALITY' ? 'var(--color-accent)' : 'transparent'}`,
+              color: activeTab === 'QUALITY' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+              borderRight: '1px solid var(--color-border)',
+              borderBottom: activeTab === 'QUALITY' ? 'none' : '1px solid var(--color-border)',
+              fontFamily: 'var(--font-code)', fontSize: '11px', cursor: 'pointer', outline: 'none'
+            }}
+            className="hover:text-[var(--color-text-primary)]"
+          >
+            <ShieldCheck size={14} /> CODE_QUALITY
           </button>
-          <button className={`tab ${activeTab === 'REVIEW' ? 'active' : ''}`} onClick={() => setActiveTab('REVIEW')}>
-            <MessageSquareCode size={14} /> AI Code Review
+          <button 
+            onClick={() => setActiveTab('REVIEW')}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', 
+              backgroundColor: activeTab === 'REVIEW' ? 'var(--color-bg)' : 'transparent',
+              borderTop: `2px solid ${activeTab === 'REVIEW' ? 'var(--color-accent)' : 'transparent'}`,
+              color: activeTab === 'REVIEW' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+              borderRight: '1px solid var(--color-border)',
+              borderBottom: activeTab === 'REVIEW' ? 'none' : '1px solid var(--color-border)',
+              fontFamily: 'var(--font-code)', fontSize: '11px', cursor: 'pointer', outline: 'none'
+            }}
+            className="hover:text-[var(--color-text-primary)]"
+          >
+            <MessageSquareCode size={14} /> AI_REVIEW
           </button>
+          <div style={{ flex: 1, borderBottom: '1px solid var(--color-border)' }} />
         </div>
       )}
       
       {/* Content Area */}
       <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {status === 'COMPLETED' && activeTab === 'FILES' && (
-          <div className="split-pane" style={{ flex: 1, gap: '1px', backgroundColor: 'var(--color-border)' }}>
-            <div style={{ width: '280px', backgroundColor: 'var(--color-surface)', flexShrink: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--color-border)', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Explorer
+          <div style={{ display: 'flex', flex: 1, backgroundColor: 'var(--color-bg)' }}>
+            <div style={{ width: '300px', backgroundColor: 'var(--color-surface)', flexShrink: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--color-border)' }}>
+              <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--color-border)', fontSize: '11px', fontFamily: 'var(--font-code)', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <SearchCode size={12} /> EXPLORER
               </div>
               <div style={{ flex: 1, overflowY: 'auto' }}>
                 <FileExplorer 
@@ -171,8 +228,8 @@ export function ProjectDetails() {
             <div style={{ flex: 1, backgroundColor: 'var(--color-bg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               {selectedFile ? (
                 loadingContent ? (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-secondary)', gap: '8px' }}>
-                    <Loader2 size={16} className="animate-spin" /> Loading editor...
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-secondary)', gap: '8px', fontFamily: 'var(--font-code)', fontSize: '12px' }}>
+                    <Loader2 size={16} className="animate-spin" /> LOADING_BUFFER...
                   </div>
                 ) : (
                   <CodeViewer 
@@ -182,8 +239,9 @@ export function ProjectDetails() {
                   />
                 )
               ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-muted)' }}>
-                  Select a file from the explorer to view its contents
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-muted)', fontFamily: 'var(--font-code)', gap: '16px' }}>
+                  <TerminalSquare size={48} style={{ opacity: 0.2 }} />
+                  <div style={{ fontSize: '12px' }}>Awaiting file selection...</div>
                 </div>
               )}
             </div>
@@ -205,21 +263,29 @@ export function ProjectDetails() {
         )}
         
         {status !== 'COMPLETED' && status !== 'NONE' && (
-          <div className="card" style={{ maxWidth: '400px', margin: '40px auto', textAlign: 'center', padding: '32px' }}>
-            <Loader2 size={32} className="animate-spin text-accent" style={{ margin: '0 auto 16px' }} />
-            <h3 className="text-primary font-semibold text-lg mb-2">Ingestion in Progress</h3>
-            <p className="text-secondary text-sm">We are downloading and parsing the repository files. This may take a few moments.</p>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', padding: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', minWidth: '300px' }}>
+              <Loader2 size={24} className="animate-spin text-accent" />
+              <div style={{ textAlign: 'center', fontFamily: 'var(--font-code)' }}>
+                <div style={{ fontSize: '13px', color: 'var(--color-text-primary)', marginBottom: '4px' }}>INGESTION_IN_PROGRESS</div>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Parsing syntax trees and generating embeddings...</div>
+              </div>
+            </div>
           </div>
         )}
         
         {status === 'NONE' && (
-          <div className="card" style={{ maxWidth: '400px', margin: '40px auto', textAlign: 'center', padding: '32px' }}>
-            <Folder size={32} className="text-muted" style={{ margin: '0 auto 16px' }} />
-            <h3 className="text-primary font-semibold text-lg mb-2">Repository Not Indexed</h3>
-            <p className="text-secondary text-sm mb-6">This repository hasn't been ingested yet. Start the ingestion process to analyze the code.</p>
-            <Button onClick={startIngestion} className="btn-primary w-full justify-center">
-              <Play size={14} /> Start Ingestion
-            </Button>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', padding: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', minWidth: '350px' }}>
+              <FolderGit2 size={32} className="text-muted" />
+              <div style={{ textAlign: 'center', fontFamily: 'var(--font-code)' }}>
+                <div style={{ fontSize: '13px', color: 'var(--color-text-primary)', marginBottom: '8px' }}>REPOSITORY_NOT_INDEXED</div>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: '1.5' }}>Codebase must be ingested into the vector database<br/>before AI tools can be used.</div>
+              </div>
+              <Button onClick={startIngestion} className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontFamily: 'var(--font-code)', fontSize: '11px' }}>
+                <Play size={14} /> INIT_INGESTION
+              </Button>
+            </div>
           </div>
         )}
       </div>

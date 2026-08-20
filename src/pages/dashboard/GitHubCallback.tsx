@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { githubService } from '../../services/githubService';
+import { TerminalSquare, RefreshCw, XCircle } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 
 export const GitHubCallback: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -24,23 +26,25 @@ export const GitHubCallback: React.FC = () => {
   }, [searchParams, navigate]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', backgroundColor: 'var(--color-bg)', fontFamily: 'var(--font-ui)' }}>
       {error ? (
-        <div className="text-red-500 mb-4">
-          <h2 className="text-xl font-bold mb-2">Connection Failed</h2>
-          <p>{error}</p>
-          <button 
+        <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-error)', borderRadius: 'var(--radius-md)', padding: '32px', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
+          <XCircle size={48} style={{ color: 'var(--color-error)', margin: '0 auto 16px auto' }} />
+          <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-error)', marginBottom: '8px', fontFamily: 'var(--font-code)' }}>CONNECTION_FAILED</h2>
+          <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '24px', fontFamily: 'var(--font-code)' }}>{error}</p>
+          <Button 
             onClick={() => navigate('/dashboard/projects')}
-            className="mt-4 px-4 py-2 bg-[var(--accent-primary)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+            className="btn-secondary"
+            style={{ width: '100%', justifyContent: 'center', fontFamily: 'var(--font-code)' }}
           >
-            Return to Projects
-          </button>
+            RETURN_TO_WORKSPACE
+          </Button>
         </div>
       ) : (
-        <div className="text-[var(--text-primary)] text-center">
-          <div className="w-12 h-12 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-xl font-bold">Connecting your GitHub account...</h2>
-          <p className="text-[var(--text-secondary)] mt-2">Please wait while we securely complete the integration.</p>
+        <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '48px 32px', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
+          <RefreshCw size={48} className="animate-spin" style={{ color: 'var(--color-accent)', margin: '0 auto 24px auto' }} />
+          <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px', fontFamily: 'var(--font-code)' }}>AUTHENTICATING_GITHUB...</h2>
+          <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-code)' }}>Please wait while we securely complete the integration.</p>
         </div>
       )}
     </div>

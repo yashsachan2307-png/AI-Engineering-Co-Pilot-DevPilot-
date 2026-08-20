@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ReviewFinding } from '../../../services/reviewService';
+import { Button } from '../../../components/ui/Button';
 
 interface FindingDetailProps {
   finding: ReviewFinding;
@@ -19,51 +20,52 @@ export const FindingDetail: React.FC<FindingDetailProps> = ({ finding, onUpdateS
   };
 
   return (
-    <div className="bg-white border rounded-lg p-6 shadow-sm sticky top-6">
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-bold text-gray-900">{finding.title}</h3>
-        <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
+    <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '24px', position: 'sticky', top: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>{finding.title}</h3>
+        <span style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text-secondary)', padding: '4px 12px', borderRadius: '16px', fontSize: '11px', fontWeight: 600, border: '1px solid var(--color-border)', fontFamily: 'var(--font-code)' }}>
           {finding.category}
         </span>
       </div>
       
-      <p className="text-gray-700 mb-6">{finding.description}</p>
+      <p style={{ color: 'var(--color-text-secondary)', fontSize: '13px', lineHeight: 1.6, marginBottom: '24px', fontFamily: 'var(--font-code)' }}>{finding.description}</p>
       
       {finding.evidence && (
-        <div className="mb-6">
-          <h4 className="text-sm font-semibold text-gray-900 mb-2">Evidence / Snippet</h4>
-          <pre className="bg-gray-50 p-4 rounded text-sm text-gray-800 overflow-x-auto border">
+        <div style={{ marginBottom: '24px' }}>
+          <h4 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px', fontFamily: 'var(--font-code)', textTransform: 'uppercase' }}>EVIDENCE_/_SNIPPET</h4>
+          <pre style={{ backgroundColor: 'var(--color-bg)', padding: '16px', borderRadius: 'var(--radius-sm)', fontSize: '12px', color: 'var(--color-text-primary)', overflowX: 'auto', border: '1px solid var(--color-border)', fontFamily: 'var(--font-code)' }}>
             <code>{finding.evidence}</code>
           </pre>
         </div>
       )}
 
-      <div className="mb-6">
-        <h4 className="text-sm font-semibold text-gray-900 mb-2">Recommendation</h4>
-        <div className="bg-blue-50 border border-blue-100 p-4 rounded text-blue-900">
+      <div style={{ marginBottom: '24px' }}>
+        <h4 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px', fontFamily: 'var(--font-code)', textTransform: 'uppercase' }}>RECOMMENDATION</h4>
+        <div style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '16px', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-primary)', fontSize: '13px', fontFamily: 'var(--font-code)' }}>
           {finding.recommendation}
         </div>
       </div>
       
-      <div className="flex items-center space-x-4 pt-4 border-t">
-        <span className="text-sm text-gray-500 mr-auto">Current Status: <strong className="text-gray-900">{finding.status}</strong></span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+        <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginRight: 'auto', fontFamily: 'var(--font-code)' }}>STATUS: <strong style={{ color: 'var(--color-text-primary)' }}>[{finding.status}]</strong></span>
         {finding.status !== 'REVIEWED' && (
-          <button 
+          <Button 
             disabled={updating}
             onClick={() => handleStatusChange('REVIEWED')}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium disabled:opacity-50 transition-colors"
+            style={{ padding: '8px 16px', fontSize: '11px', fontFamily: 'var(--font-code)', backgroundColor: 'var(--color-success)', color: '#000', border: 'none' }}
           >
-            Mark as Fixed/Reviewed
-          </button>
+            MARK_AS_FIXED
+          </Button>
         )}
         {finding.status !== 'DISMISSED' && (
-          <button 
+          <Button 
             disabled={updating}
             onClick={() => handleStatusChange('DISMISSED')}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded font-medium disabled:opacity-50 transition-colors"
+            className="btn-secondary"
+            style={{ padding: '8px 16px', fontSize: '11px', fontFamily: 'var(--font-code)' }}
           >
-            Dismiss
-          </button>
+            DISMISS
+          </Button>
         )}
       </div>
     </div>

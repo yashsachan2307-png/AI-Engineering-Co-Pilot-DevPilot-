@@ -12,8 +12,10 @@ import {
   CheckCircle2, 
   HelpCircle,
   Wrench,
-  TerminalSquare
+  TerminalSquare,
+  ChevronRight
 } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 
 interface Repo {
   id: number;
@@ -73,7 +75,7 @@ export function AIAssistant() {
 
   const fetchRepositories = async () => {
     try {
-      const res = await fetch('/api/repositories', {
+      const res = await fetch(`${API_BASE_URL}/api/repositories`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
@@ -154,7 +156,6 @@ export function AIAssistant() {
     
     let currentConvId = activeConversationId;
     if (!currentConvId) {
-      // Auto-create conversation if none exists
       try {
         const conv = await aiService.createConversation(selectedRepoId, text.substring(0, 30) + "...", token || undefined);
         setConversations(prev => [conv, ...prev]);
@@ -186,7 +187,7 @@ export function AIAssistant() {
         id: Date.now() + 1,
         conversationId: currentConvId,
         role: 'assistant',
-        content: `⚠️ **Error querying agent:** ${e.message}`,
+        content: `[ERROR] Failed to query intelligence engine: ${e.message}`,
         createdAt: new Date().toISOString(),
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -196,20 +197,27 @@ export function AIAssistant() {
   };
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexShrink: 0 }}>
-        <div>
-          <h1 className="text-xl font-semibold text-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <TerminalSquare className="text-accent" size={20} />
-            AI Workspace
-          </h1>
-          <p className="text-secondary text-sm mt-1">Context-aware engineering assistant</p>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-surface)' }}>
-            <FolderGit2 size={14} className="text-muted" />
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--color-bg)' }}>
+      {/* Top Context Bar */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '12px 24px', 
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        flexShrink: 0 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-accent)', fontFamily: 'var(--font-code)', fontSize: '13px' }}>
+            <TerminalSquare size={16} />
+            <span>AI_ASSISTANT_SESSION</span>
+          </div>
+          
+          <div style={{ height: 16, width: 1, backgroundColor: 'var(--color-border)' }} />
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg)' }}>
+            <FolderGit2 size={12} className="text-muted" />
             <select
               value={selectedRepoId || ''}
               onChange={(e) => setSelectedRepoId(Number(e.target.value))}
@@ -217,12 +225,15 @@ export function AIAssistant() {
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--color-text-primary)',
-                fontSize: '12px',
+                fontFamily: 'var(--font-code)',
+                fontSize: '11px',
                 outline: 'none',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                width: '180px',
+                textOverflow: 'ellipsis'
               }}
             >
-              {repositories.length === 0 && <option value="">No repositories imported</option>}
+              {repositories.length === 0 && <option value="">NO_REPOSITORIES</option>}
               {repositories.map(r => (
                 <option key={r.id} value={r.id} style={{ background: 'var(--color-surface)' }}>
                   {r.fullName || r.name}
@@ -230,34 +241,40 @@ export function AIAssistant() {
               ))}
             </select>
           </div>
+        </div>
 
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Button
-            className={indexStatus === 'COMPLETED' ? 'btn-secondary' : 'btn-primary'}
+            className={indexStatus === 'COMPLETED' ? 'btn-ghost' : 'btn-secondary'}
             onClick={handleStartIndexing}
             disabled={!selectedRepoId || isIndexing}
+            style={{ fontFamily: 'var(--font-code)', fontSize: '11px' }}
           >
             {isIndexing ? (
-              <><RefreshCw size={14} className="animate-spin" /> Indexing...</>
+              <><RefreshCw size={12} className="animate-spin" /> INDEXING...</>
             ) : indexStatus === 'COMPLETED' ? (
-              <><CheckCircle2 size={14} className="text-success" /> Re-Index</>
+              <><CheckCircle2 size={12} className="text-success" /> RE-INDEX</>
             ) : (
-              <><Database size={14} /> Index</>
+              <><Database size={12} /> INDEX_REPO</>
             )}
           </Button>
 
-          <Button className="btn-secondary" onClick={handleNewConversation} disabled={!selectedRepoId}>
-            New Chat
+          <Button className="btn-secondary" onClick={handleNewConversation} disabled={!selectedRepoId} style={{ fontFamily: 'var(--font-code)', fontSize: '11px' }}>
+            + NEW_SESSION
           </Button>
         </div>
       </div>
 
-      {/* Chat Area */}
-      <div className="card" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Terminal View Area */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {messages.length === 0 && !isQuerying && (
-            <div style={{ textAlign: 'center', margin: 'auto', color: 'var(--color-text-muted)' }}>
-              <Bot size={32} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
-              <p className="text-sm">Start a conversation with the engineering agent.</p>
+            <div style={{ textAlign: 'center', margin: 'auto', color: 'var(--color-text-muted)', fontFamily: 'var(--font-code)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+              <TerminalSquare size={48} style={{ opacity: 0.2 }} />
+              <div>
+                <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>ENGINEERING_AGENT_READY</div>
+                <div style={{ fontSize: '12px' }}>Awaiting instruction input...</div>
+              </div>
             </div>
           )}
 
@@ -265,19 +282,16 @@ export function AIAssistant() {
             if (msg.role === 'tool') return null;
             
             if (msg.role === 'assistant' && msg.toolCallsJson) {
-              let toolName = "Unknown Tool";
+              let toolName = "UnknownTool";
               try {
                 const parsed = JSON.parse(msg.toolCallsJson);
                 toolName = parsed.tool || toolName;
               } catch (e) {}
 
               return (
-                <div key={msg.id} style={{ display: 'flex', gap: '12px', alignSelf: 'flex-start', maxWidth: '85%' }}>
-                  <div style={{ width: '28px', flexShrink: 0 }} />
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-accent)', fontSize: '11px', padding: '6px 10px', borderLeft: '2px solid var(--color-accent)', backgroundColor: 'var(--color-surface)' }}>
-                    <Wrench size={12} />
-                    <span>Agent called tool: <strong>{toolName}</strong></span>
-                  </div>
+                <div key={msg.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-code)', fontSize: '11px', paddingLeft: '24px' }}>
+                  <Wrench size={12} />
+                  <span>[EXEC] Invoking external tool: {toolName}()</span>
                 </div>
               );
             }
@@ -288,54 +302,51 @@ export function AIAssistant() {
                 style={{
                   display: 'flex',
                   gap: '12px',
-                  alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                  maxWidth: '85%',
+                  alignSelf: 'stretch',
+                  paddingBottom: '20px',
+                  borderBottom: '1px solid var(--color-border)'
                 }}
               >
-                {msg.role === 'assistant' && (
-                  <div style={{ width: '28px', height: '28px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-accent)', flexShrink: 0 }}>
-                    <Bot size={14} />
-                  </div>
-                )}
+                <div style={{ flexShrink: 0, marginTop: '2px' }}>
+                  {msg.role === 'assistant' ? (
+                    <Bot size={16} className="text-accent" />
+                  ) : (
+                    <ChevronRight size={16} className="text-secondary" />
+                  )}
+                </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 600, fontFamily: 'var(--font-code)', color: msg.role === 'user' ? 'var(--color-text-secondary)' : 'var(--color-accent)' }}>
+                      {msg.role === 'user' ? 'USER' : 'AGENT'}
+                    </span>
+                    <span style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-code)' }}>
+                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </span>
+                  </div>
                   <div
                     style={{
-                      backgroundColor: msg.role === 'user' ? 'var(--color-surface)' : 'transparent',
-                      color: 'var(--color-text-primary)',
-                      padding: msg.role === 'user' ? '12px 16px' : '0 12px',
-                      border: msg.role === 'user' ? '1px solid var(--color-border)' : 'none',
-                      borderRadius: 'var(--radius-sm)',
+                      color: msg.role === 'user' ? 'var(--color-text-primary)' : 'var(--color-text-primary)',
                       lineHeight: '1.6',
                       fontSize: '13px',
                       whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word'
+                      wordBreak: 'break-word',
+                      fontFamily: msg.role === 'user' ? 'var(--font-code)' : 'var(--font-ui)',
                     }}
                   >
                     {msg.content}
                   </div>
-                  <div style={{ fontSize: '10px', color: 'var(--color-text-muted)', alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', padding: '0 12px' }}>
-                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
                 </div>
-
-                {msg.role === 'user' && (
-                  <div style={{ width: '28px', height: '28px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)', flexShrink: 0 }}>
-                    <User size={14} />
-                  </div>
-                )}
               </div>
             );
           })}
 
           {isQuerying && (
             <div style={{ display: 'flex', gap: '12px', alignSelf: 'flex-start' }}>
-              <div style={{ width: '28px', height: '28px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-accent)', flexShrink: 0 }}>
-                <Bot size={14} />
-              </div>
-              <div style={{ padding: '0 12px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
+              <Bot size={16} className="text-accent" style={{ marginTop: '2px' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-secondary)', fontSize: '12px', fontFamily: 'var(--font-code)' }}>
                 <RefreshCw size={12} className="animate-spin" />
-                Agent is thinking...
+                PROCESSING_QUERY...
               </div>
             </div>
           )}
@@ -344,10 +355,10 @@ export function AIAssistant() {
         </div>
 
         {/* Input Area */}
-        <div style={{ borderTop: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)' }}>
-          <div style={{ padding: '8px 16px', display: 'flex', gap: '8px', overflowX: 'auto', alignItems: 'center' }}>
-            <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
-              <HelpCircle size={10} /> Suggested:
+        <div style={{ borderTop: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', padding: '16px 24px' }}>
+          <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', alignItems: 'center', marginBottom: '12px' }}>
+            <span style={{ fontSize: '11px', fontFamily: 'var(--font-code)', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <HelpCircle size={10} /> SUGGESTIONS:
             </span>
             {STARTER_PROMPTS.map((prompt, idx) => (
               <button
@@ -355,28 +366,43 @@ export function AIAssistant() {
                 onClick={() => handleSendMessage(prompt)}
                 disabled={isQuerying || !selectedRepoId}
                 style={{
-                  backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '4px', padding: '4px 8px', fontSize: '11px', color: 'var(--color-text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap'
+                  backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', fontSize: '11px', color: 'var(--color-text-secondary)', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'var(--font-code)'
                 }}
-                className="hover:bg-[var(--color-border)] hover:text-[var(--color-text-primary)] transition-colors"
+                className="hover:border-[var(--color-border-hover)] hover:text-[var(--color-text-primary)] transition-colors"
               >
                 {prompt}
               </button>
             ))}
           </div>
 
-          <div style={{ padding: '12px 16px', display: 'flex', gap: '12px', backgroundColor: 'var(--color-surface)' }}>
-            <input
-              type="text"
-              value={inputQuery}
-              onChange={(e) => setInputQuery(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-              placeholder={!selectedRepoId ? "Select a repository first..." : "Ask the agent anything..."}
-              disabled={!selectedRepoId || isQuerying}
-              className="form-input"
-              style={{ flex: 1 }}
-            />
-            <Button className="btn-primary" onClick={() => handleSendMessage()} disabled={!selectedRepoId || !inputQuery.trim() || isQuerying}>
-              <Send size={14} /> Ask
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+            <div style={{ flex: 1, backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', display: 'flex', padding: '2px' }}>
+              <div style={{ padding: '10px 8px', color: 'var(--color-text-muted)' }}>
+                <ChevronRight size={14} />
+              </div>
+              <textarea
+                value={inputQuery}
+                onChange={(e) => setInputQuery(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+                placeholder={!selectedRepoId ? "SELECT REPOSITORY TO BEGIN" : "Enter instruction or query..."}
+                disabled={!selectedRepoId || isQuerying}
+                style={{ 
+                  flex: 1, 
+                  background: 'transparent', 
+                  border: 'none', 
+                  color: 'var(--color-text-primary)',
+                  fontSize: '13px',
+                  fontFamily: 'var(--font-code)',
+                  padding: '8px 8px 8px 0',
+                  outline: 'none',
+                  minHeight: '40px',
+                  resize: 'none'
+                }}
+                rows={1}
+              />
+            </div>
+            <Button className="btn-primary" onClick={() => handleSendMessage()} disabled={!selectedRepoId || !inputQuery.trim() || isQuerying} style={{ height: '44px', fontFamily: 'var(--font-code)' }}>
+              <Send size={14} /> EXECUTE
             </Button>
           </div>
         </div>
@@ -384,3 +410,4 @@ export function AIAssistant() {
     </div>
   );
 }
+

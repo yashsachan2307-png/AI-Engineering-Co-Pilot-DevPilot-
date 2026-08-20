@@ -1,23 +1,35 @@
-import { Activity as ActivityIcon, History } from 'lucide-react';
+import { Activity as ActivityIcon, History, TerminalSquare } from 'lucide-react';
 
 export function Activity() {
   return (
-    <div className="flex flex-col gap-4 h-full bg-bg overflow-hidden p-6">
-      <div className="flex items-center gap-2 mb-2">
-        <ActivityIcon size={18} className="text-primary" />
-        <h1 className="text-lg font-semibold text-primary m-0">Activity</h1>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', backgroundColor: 'var(--color-bg)' }}>
+      {/* Top Context Bar */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '12px 24px', 
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        flexShrink: 0 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-accent)', fontFamily: 'var(--font-code)', fontSize: '13px' }}>
+            <ActivityIcon size={16} />
+            <span>SYSTEM_ACTIVITY_LOG</span>
+          </div>
+        </div>
       </div>
 
-      <div className="panel bg-surface p-5 max-w-3xl">
-        <div className="flex items-center gap-2 mb-4">
-          <History size={16} className="text-secondary" />
-          <h2 className="text-sm font-semibold text-primary m-0">Recent Activity</h2>
-        </div>
-        
-        <div className="bg-[#0f172a] border border-dashed border-border rounded-md p-8 flex flex-col items-center justify-center text-center">
-          <History size={32} className="text-muted/50 mb-3" />
-          <p className="text-sm text-primary mb-1">No recent activity</p>
-          <p className="text-xs text-muted">Your recent AI generations, debug sessions, and repo scans will appear here.</p>
+      <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', minWidth: '400px' }}>
+          <TerminalSquare size={48} className="text-muted" style={{ opacity: 0.5 }} />
+          <div style={{ textAlign: 'center', fontFamily: 'var(--font-code)' }}>
+            <div style={{ fontSize: '14px', color: 'var(--color-text-primary)', marginBottom: '12px' }}>NO_RECENT_ACTIVITY</div>
+            <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: '1.6' }}>
+              Your recent AI generations, debug sessions,<br/>and repo scans will appear here.
+            </div>
+          </div>
         </div>
       </div>
     </div>

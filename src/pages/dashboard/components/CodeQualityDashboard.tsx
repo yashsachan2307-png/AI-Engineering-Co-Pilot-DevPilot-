@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
+import { API_BASE_URL } from '../../../services/api';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import vscDarkPlus from 'react-syntax-highlighter/dist/esm/styles/prism/vsc-dark-plus';
 import { 
   AlertTriangle, 
   CheckCircle2, 
@@ -49,7 +52,7 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
   const fetchStatus = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${repositoryId}/analysis/static-status`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/analysis/static-status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -69,7 +72,7 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
   const fetchFindings = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${repositoryId}/analysis/findings`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/analysis/findings`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -87,7 +90,7 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
   const startAnalysis = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${repositoryId}/analysis/static`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/analysis/static`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -111,14 +114,14 @@ export function CodeQualityDashboard({ repositoryId }: { repositoryId: string })
 
     try {
       // Find all files to locate repositoryFileId if available or query file content
-      const filesRes = await fetch(`http://localhost:8080/api/repositories/${repositoryId}/files`, {
+      const filesRes = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/files`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (filesRes.ok) {
         const files: any[] = await filesRes.json();
         const matched = files.find(f => f.path === finding.fileName);
         if (matched) {
-          const contentRes = await fetch(`http://localhost:8080/api/repositories/${repositoryId}/files/${matched.id}`, {
+          const contentRes = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/files/${matched.id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (contentRes.ok) {

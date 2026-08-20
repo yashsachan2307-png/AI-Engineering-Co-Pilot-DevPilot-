@@ -5,7 +5,8 @@ import { ReactFlow, Controls, Background, Node, Edge, MarkerType } from '@xyflow
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
 import { Button } from '../../components/ui/Button';
-import { Network, FolderGit2, Info, MessageSquare, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Network, FolderGit2, Info, MessageSquare, AlertTriangle, RefreshCw, TerminalSquare } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 
 interface Repo {
   id: number;
@@ -37,8 +38,6 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
     node.targetPosition = direction === 'TB' ? 'top' : 'left' as any;
     node.sourcePosition = direction === 'TB' ? 'bottom' : 'right' as any;
 
-    // We are shifting the dagre node position (anchor=center center) to the top left
-    // so it matches the React Flow node anchor point (top left).
     node.position = {
       x: nodeWithPosition.x - nodeWidth / 2,
       y: nodeWithPosition.y - nodeHeight / 2,
@@ -66,7 +65,7 @@ export function Architecture() {
   useEffect(() => {
     const fetchRepositories = async () => {
       try {
-        const res = await fetch('/api/repositories', {
+        const res = await fetch(`${API_BASE_URL}/api/repositories`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (res.ok) {
@@ -98,13 +97,13 @@ export function Architecture() {
         position: { x: 0, y: 0 },
         data: { label: n.name },
         style: {
-          background: n.type === 'CLASS' ? '#1e293b' : (n.type === 'INTERFACE' ? '#0f172a' : '#334155'),
-          color: '#f8fafc',
-          border: '1px solid #334155',
-          borderRadius: '4px',
+          background: n.type === 'CLASS' ? 'var(--color-surface)' : (n.type === 'INTERFACE' ? 'var(--color-bg)' : 'var(--color-surface-hover)'),
+          color: 'var(--color-text-primary)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-sm)',
           padding: '8px',
           fontSize: '11px',
-          fontFamily: 'monospace',
+          fontFamily: 'var(--font-code)',
           fontWeight: 600,
           boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
         }
@@ -116,10 +115,10 @@ export function Architecture() {
         target: e.target,
         type: 'smoothstep',
         animated: false,
-        style: { stroke: '#475569' },
+        style: { stroke: 'var(--color-text-muted)' },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: '#475569'
+          color: 'var(--color-text-muted)'
         }
       }));
       
@@ -165,42 +164,60 @@ export function Architecture() {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full bg-bg overflow-hidden">
-      <div className="panel border-b-0 border-l-0 border-r-0 rounded-none flex justify-between items-center px-4 py-3 shrink-0 bg-surface">
-        <div>
-          <h1 className="text-sm font-semibold text-primary flex items-center gap-2 m-0">
-            <Network size={16} className="text-accent" />
-            Architecture & Dependencies
-          </h1>
-          <p className="text-xs text-secondary mt-1 m-0">
-            Deterministic graph visualization and AI architectural analysis.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 px-3 py-1 bg-surface-hover border border-border rounded-sm">
-          <FolderGit2 size={14} className="text-muted" />
-          <select
-            value={selectedRepoId || ''}
-            onChange={(e) => setSelectedRepoId(Number(e.target.value))}
-            className="select text-xs py-0.5 border-none bg-transparent pl-0 focus:ring-0 w-48"
-          >
-            {repositories.length === 0 && <option value="">No repositories imported</option>}
-            {repositories.map(r => (
-              <option key={r.id} value={r.id} className="bg-surface text-primary">
-                {r.fullName || r.name}
-              </option>
-            ))}
-          </select>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', backgroundColor: 'var(--color-bg)' }}>
+      {/* Top Context Bar */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '12px 24px', 
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        flexShrink: 0 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-accent)', fontFamily: 'var(--font-code)', fontSize: '13px' }}>
+            <TerminalSquare size={16} />
+            <span>ARCHITECTURE_ANALYZER</span>
+          </div>
+          
+          <div style={{ height: 16, width: 1, backgroundColor: 'var(--color-border)' }} />
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg)' }}>
+            <FolderGit2 size={12} className="text-muted" />
+            <select
+              value={selectedRepoId || ''}
+              onChange={(e) => setSelectedRepoId(Number(e.target.value))}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--color-text-primary)',
+                fontFamily: 'var(--font-code)',
+                fontSize: '11px',
+                outline: 'none',
+                cursor: 'pointer',
+                width: '180px',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {repositories.length === 0 && <option value="">NO_REPOSITORIES</option>}
+              {repositories.map(r => (
+                <option key={r.id} value={r.id} style={{ background: 'var(--color-surface)' }}>
+                  {r.fullName || r.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-4 flex-1 overflow-hidden min-h-0">
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left: Graph */}
-        <div className="panel flex-1 flex flex-col min-w-0 border-l-0 border-r border-t border-b-0 rounded-none relative bg-[#0f172a]">
+        <div style={{ flex: 1, position: 'relative', backgroundColor: 'var(--color-bg)' }}>
             {loading ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-bg/80 backdrop-blur-sm">
-                <RefreshCw className="animate-spin text-accent" size={32} />
-                <p className="text-sm font-semibold text-primary">Analyzing Architecture...</p>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 10, backgroundColor: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(4px)' }}>
+                <RefreshCw className="animate-spin text-accent" size={32} style={{ marginBottom: '16px' }} />
+                <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }}>ANALYZING_ARCHITECTURE...</p>
               </div>
             ) : (
               <ReactFlow 
@@ -209,78 +226,92 @@ export function Architecture() {
                 onNodeClick={onNodeClick}
                 fitView
               >
-                <Background color="#334155" gap={16} />
-                <Controls className="bg-surface border-border fill-primary" />
+                <Background color="var(--color-border)" gap={16} />
+                <Controls style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }} />
               </ReactFlow>
             )}
         </div>
 
         {/* Right: Sidebar */}
-        <div className="w-80 flex flex-col gap-4 overflow-y-auto pr-4 pb-4">
+        <div style={{ width: '320px', display: 'flex', flexDirection: 'column', flexShrink: 0, backgroundColor: 'var(--color-surface)', borderLeft: '1px solid var(--color-border)' }}>
           {analysis && analysis.circularDependencies && analysis.circularDependencies.length > 0 && (
-             <div className="panel border-l-4 border-warning/70">
-               <div className="px-3 py-2.5 border-b border-border bg-warning/5 flex items-center gap-2">
+             <div style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', borderLeft: '4px solid var(--color-warning)' }}>
+               <div style={{ padding: '8px 16px', backgroundColor: 'rgba(234, 179, 8, 0.05)', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                  <AlertTriangle size={14} className="text-warning" />
-                 <h3 className="text-sm font-semibold text-warning m-0">Circular Dependencies</h3>
+                 <h3 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-warning)', margin: 0, fontFamily: 'var(--font-code)' }}>CIRCULAR_DEPENDENCIES</h3>
                </div>
-               <div className="p-3 bg-surface">
-                 <ul className="text-xs text-secondary pl-5 m-0 space-y-1.5 leading-relaxed font-mono">
-                   {analysis.circularDependencies.map((c, i) => <li key={i}>{c}</li>)}
+               <div style={{ padding: '12px' }}>
+                 <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--color-text-secondary)', fontSize: '11px', fontFamily: 'var(--font-code)' }}>
+                   {analysis.circularDependencies.map((c, i) => <li key={i} style={{ marginBottom: '4px' }}>{c}</li>)}
                  </ul>
                </div>
              </div>
           )}
 
-          <div className="panel flex-1 flex flex-col">
-            <div className="px-3 py-2.5 border-b border-border bg-surface-hover flex items-center gap-2 shrink-0">
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+            <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
               <Info size={14} className="text-accent" />
-              <h3 className="text-sm font-semibold text-primary m-0">Module Details</h3>
+              <h3 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>MODULE_TELEMETRY</h3>
             </div>
-            <div className="p-4 bg-surface flex-1 overflow-y-auto">
+            <div style={{ padding: '16px', overflowY: 'auto', flex: 1 }}>
               {!selectedNode ? (
-                <div className="h-full flex flex-col items-center justify-center text-center text-muted">
-                  <Network size={32} className="opacity-30 mb-3" />
-                  <p className="text-xs">Click a node in the graph to view details and ask the AI questions.</p>
+                <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                  <Network size={32} style={{ opacity: 0.3, marginBottom: '16px' }} />
+                  <p style={{ fontSize: '12px', fontFamily: 'var(--font-code)' }}>Select a node in the graph to inspect.</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
-                    <h3 className="text-sm font-mono font-semibold text-primary break-all m-0">{selectedNode.name}</h3>
-                    <div className="inline-block mt-2 px-1.5 py-0.5 bg-surface-hover text-secondary rounded text-[10px] tracking-wider uppercase border border-border">
+                    <h3 style={{ fontSize: '12px', fontFamily: 'var(--font-code)', fontWeight: 600, color: 'var(--color-text-primary)', wordBreak: 'break-all', margin: 0 }}>{selectedNode.name}</h3>
+                    <div style={{ display: 'inline-block', marginTop: '8px', padding: '2px 6px', backgroundColor: 'var(--color-surface-hover)', color: 'var(--color-text-secondary)', borderRadius: 'var(--radius-sm)', fontSize: '10px', letterSpacing: '0.05em', textTransform: 'uppercase', border: '1px solid var(--color-border)', fontFamily: 'var(--font-code)' }}>
                       {selectedNode.type}
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-[11px] font-semibold text-secondary uppercase tracking-wider mb-2">Coupling Metrics</h4>
-                    <ul className="text-xs text-secondary pl-4 m-0 space-y-1.5">
-                      {selectedNode.metrics?.map((m, i) => <li key={i}>{m}</li>)}
+                    <h4 style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', fontFamily: 'var(--font-code)' }}>COUPLING_METRICS</h4>
+                    <ul style={{ margin: 0, paddingLeft: '16px', color: 'var(--color-text-secondary)', fontSize: '11px', fontFamily: 'var(--font-code)' }}>
+                      {selectedNode.metrics?.map((m, i) => <li key={i} style={{ marginBottom: '4px' }}>{m}</li>)}
                     </ul>
                   </div>
 
-                  <div className="mt-2 pt-4 border-t border-border">
-                    <h4 className="text-xs font-semibold text-primary flex items-center gap-2 mb-3">
+                  <div style={{ marginTop: '8px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                    <h4 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', fontFamily: 'var(--font-code)' }}>
                       <MessageSquare size={14} className="text-accent" />
-                      Ask AI about this module
+                      ASK_AI
                     </h4>
                     <textarea 
                       value={explainQuestion}
                       onChange={(e) => setExplainQuestion(e.target.value)}
-                      placeholder="e.g., Why does this module have high coupling?"
-                      className="input text-xs w-full resize-none mb-3"
+                      placeholder="e.g. Why does this module have high coupling?"
+                      style={{
+                        width: '100%',
+                        backgroundColor: 'var(--color-bg)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius-sm)',
+                        color: 'var(--color-text-primary)',
+                        fontSize: '11px',
+                        fontFamily: 'var(--font-code)',
+                        padding: '10px',
+                        resize: 'none',
+                        outline: 'none',
+                        marginBottom: '12px',
+                        boxSizing: 'border-box'
+                      }}
                       rows={3}
                     />
                     <Button 
-                      className="btn-primary w-full justify-center text-xs py-1.5"
+                      className="btn-primary"
+                      style={{ width: '100%', justifyContent: 'center', fontFamily: 'var(--font-code)', fontSize: '11px', padding: '8px' }}
                       onClick={handleExplain} 
                       disabled={!explainQuestion || isExplaining}
                     >
-                      {isExplaining ? <><RefreshCw size={12} className="animate-spin mr-2" /> Analyzing...</> : 'Ask AI'}
+                      {isExplaining ? <><RefreshCw size={12} className="animate-spin mr-2" /> ANALYZING...</> : 'EXECUTE_QUERY'}
                     </Button>
 
                     {explanation && (
-                      <div className="mt-4 p-3 bg-surface-hover border-l-2 border-accent text-xs text-secondary leading-relaxed">
-                        <strong className="text-primary block mb-1 font-semibold">AI Analysis:</strong>
+                      <div style={{ marginTop: '16px', padding: '12px', backgroundColor: 'var(--color-bg)', borderLeft: '2px solid var(--color-accent)', fontSize: '11px', color: 'var(--color-text-secondary)', lineHeight: '1.6', fontFamily: 'var(--font-code)' }}>
+                        <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>[AI_RESPONSE]:</strong>
                         {explanation}
                       </div>
                     )}

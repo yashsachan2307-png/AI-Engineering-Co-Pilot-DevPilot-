@@ -1,37 +1,60 @@
-import { Settings as SettingsIcon, User, Link as LinkIcon } from 'lucide-react';
+import { Settings as SettingsIcon, User, Link as LinkIcon, TerminalSquare } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
 export function Settings() {
   return (
-    <div className="flex flex-col gap-4 h-full bg-bg overflow-hidden p-6">
-      <div className="flex items-center gap-2 mb-2">
-        <SettingsIcon size={18} className="text-primary" />
-        <h1 className="text-lg font-semibold text-primary m-0">Settings</h1>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', backgroundColor: 'var(--color-bg)' }}>
+      {/* Top Context Bar */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '12px 24px', 
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        flexShrink: 0 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-code)', fontSize: '13px' }}>
+            <TerminalSquare size={16} />
+            <span>SYSTEM_CONFIGURATION</span>
+          </div>
+        </div>
       </div>
       
-      <div className="flex flex-col gap-4 max-w-3xl">
-        <div className="panel bg-surface p-5">
-          <div className="flex items-center gap-2 mb-1">
-            <User size={16} className="text-secondary" />
-            <h2 className="text-sm font-semibold text-primary m-0">Profile</h2>
+      <div style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '800px' }}>
+          <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <User size={14} className="text-secondary" />
+              <h2 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>USER_PROFILE</h2>
+            </div>
+            <div style={{ padding: '16px' }}>
+              <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '16px', margin: '0 0 16px 0', fontFamily: 'var(--font-code)' }}>Manage your account settings and preferences.</p>
+              <div style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '16px', marginBottom: '16px' }}>
+                <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-code)' }}>[PROFILE_DATA_AWAITING_INITIALIZATION]</p>
+              </div>
+              <Button className="btn-secondary" style={{ fontSize: '11px', fontFamily: 'var(--font-code)', padding: '6px 12px' }}>
+                EDIT_PROFILE
+              </Button>
+            </div>
           </div>
-          <p className="text-xs text-secondary mb-4 m-0">Manage your account settings and preferences.</p>
-          <div className="bg-[#0f172a] border border-border rounded-md p-4 mb-4">
-            <p className="text-xs text-muted">Profile settings will go here.</p>
-          </div>
-          <Button className="btn-secondary text-xs py-1.5 px-4">Edit Profile</Button>
-        </div>
 
-        <div className="panel bg-surface p-5">
-          <div className="flex items-center gap-2 mb-1">
-            <LinkIcon size={16} className="text-secondary" />
-            <h2 className="text-sm font-semibold text-primary m-0">Integrations</h2>
+          <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <LinkIcon size={14} className="text-secondary" />
+              <h2 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>INTEGRATIONS</h2>
+            </div>
+            <div style={{ padding: '16px' }}>
+              <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '16px', margin: '0 0 16px 0', fontFamily: 'var(--font-code)' }}>Connect DevPilot with your external tools.</p>
+              <div style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '16px', marginBottom: '16px' }}>
+                <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-code)' }}>[NO_ACTIVE_INTEGRATIONS_DETECTED]</p>
+              </div>
+              <Button className="btn-secondary" style={{ fontSize: '11px', fontFamily: 'var(--font-code)', padding: '6px 12px' }}>
+                CONFIGURE_INTEGRATIONS
+              </Button>
+            </div>
           </div>
-          <p className="text-xs text-secondary mb-4 m-0">Connect DevPilot with your external tools.</p>
-          <div className="bg-[#0f172a] border border-border rounded-md p-4 mb-4">
-            <p className="text-xs text-muted">GitHub, GitLab, and Jira integrations.</p>
-          </div>
-          <Button className="btn-secondary text-xs py-1.5 px-4">Manage Integrations</Button>
         </div>
       </div>
     </div>

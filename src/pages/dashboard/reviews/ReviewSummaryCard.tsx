@@ -9,22 +9,22 @@ interface ReviewSummaryCardProps {
 
 export const ReviewSummaryCard: React.FC<ReviewSummaryCardProps> = ({ critical, high, medium, low }) => {
   return (
-    <div className="grid grid-cols-4 gap-4 mb-6">
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-        <h4 className="text-red-800 text-sm font-semibold mb-1">Critical</h4>
-        <span className="text-3xl font-bold text-red-600">{critical}</span>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+      <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--color-error)', borderRadius: 'var(--radius-sm)', padding: '16px', textAlign: 'center' }}>
+        <h4 style={{ color: 'var(--color-error)', fontSize: '11px', fontWeight: 600, marginBottom: '4px', fontFamily: 'var(--font-code)', textTransform: 'uppercase' }}>CRITICAL</h4>
+        <span style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-error)', fontFamily: 'var(--font-code)' }}>{critical}</span>
       </div>
-      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
-        <h4 className="text-orange-800 text-sm font-semibold mb-1">High</h4>
-        <span className="text-3xl font-bold text-orange-600">{high}</span>
+      <div style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', border: '1px solid var(--color-warning)', borderRadius: 'var(--radius-sm)', padding: '16px', textAlign: 'center' }}>
+        <h4 style={{ color: 'var(--color-warning)', fontSize: '11px', fontWeight: 600, marginBottom: '4px', fontFamily: 'var(--font-code)', textTransform: 'uppercase' }}>HIGH</h4>
+        <span style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-warning)', fontFamily: 'var(--font-code)' }}>{high}</span>
       </div>
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-        <h4 className="text-yellow-800 text-sm font-semibold mb-1">Medium</h4>
-        <span className="text-3xl font-bold text-yellow-600">{medium}</span>
+      <div style={{ backgroundColor: 'rgba(234, 179, 8, 0.1)', border: '1px solid var(--color-accent)', borderRadius: 'var(--radius-sm)', padding: '16px', textAlign: 'center' }}>
+        <h4 style={{ color: 'var(--color-accent)', fontSize: '11px', fontWeight: 600, marginBottom: '4px', fontFamily: 'var(--font-code)', textTransform: 'uppercase' }}>MEDIUM</h4>
+        <span style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-code)' }}>{medium}</span>
       </div>
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-        <h4 className="text-blue-800 text-sm font-semibold mb-1">Low</h4>
-        <span className="text-3xl font-bold text-blue-600">{low}</span>
+      <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--color-success)', borderRadius: 'var(--radius-sm)', padding: '16px', textAlign: 'center' }}>
+        <h4 style={{ color: 'var(--color-success)', fontSize: '11px', fontWeight: 600, marginBottom: '4px', fontFamily: 'var(--font-code)', textTransform: 'uppercase' }}>LOW</h4>
+        <span style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-success)', fontFamily: 'var(--font-code)' }}>{low}</span>
       </div>
     </div>
   );

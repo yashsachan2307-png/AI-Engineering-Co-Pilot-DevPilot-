@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './api';
+
 export interface RagSourceCitation {
   path: string;
   startLine: number;
@@ -41,7 +43,7 @@ export class AIService {
   }
 
   async startIndexing(repositoryId: number | string, token?: string): Promise<{ status: string }> {
-    const res = await fetch(`/api/repositories/${repositoryId}/rag/index`, {
+    const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/rag/index`, {
       method: 'POST',
       headers: this.getAuthHeaders(token),
     });
@@ -53,7 +55,7 @@ export class AIService {
   }
 
   async getIndexStatus(repositoryId: number | string, token?: string): Promise<{ status: string }> {
-    const res = await fetch(`/api/repositories/${repositoryId}/rag/status`, {
+    const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/rag/status`, {
       headers: this.getAuthHeaders(token),
     });
     if (!res.ok) {
@@ -63,7 +65,7 @@ export class AIService {
   }
 
   async queryRepository(repositoryId: number | string, query: string, token?: string): Promise<RagQueryResponse> {
-    const res = await fetch(`/api/repositories/${repositoryId}/rag/query`, {
+    const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/rag/query`, {
       method: 'POST',
       headers: this.getAuthHeaders(token),
       body: JSON.stringify({ query }),
@@ -77,7 +79,7 @@ export class AIService {
 
   // Phase 10: Agent Endpoints
   async createConversation(repositoryId: number | string, title: string, token?: string): Promise<AIConversation> {
-    const res = await fetch(`/api/repositories/${repositoryId}/conversations`, {
+    const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/conversations`, {
       method: 'POST',
       headers: this.getAuthHeaders(token),
       body: JSON.stringify({ title }),
@@ -87,7 +89,7 @@ export class AIService {
   }
 
   async getConversations(repositoryId: number | string, token?: string): Promise<AIConversation[]> {
-    const res = await fetch(`/api/repositories/${repositoryId}/conversations`, {
+    const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/conversations`, {
       headers: this.getAuthHeaders(token),
     });
     if (!res.ok) throw new Error('Failed to fetch conversations');
@@ -95,7 +97,7 @@ export class AIService {
   }
 
   async getMessages(conversationId: number | string, token?: string): Promise<AIMessage[]> {
-    const res = await fetch(`/api/conversations/${conversationId}/messages`, {
+    const res = await fetch(`${API_BASE_URL}/api/conversations/${conversationId}/messages`, {
       headers: this.getAuthHeaders(token),
     });
     if (!res.ok) throw new Error('Failed to fetch messages');
@@ -103,7 +105,7 @@ export class AIService {
   }
 
   async sendMessage(conversationId: number | string, content: string, token?: string): Promise<AIMessage[]> {
-    const res = await fetch(`/api/conversations/${conversationId}/messages`, {
+    const res = await fetch(`${API_BASE_URL}/api/conversations/${conversationId}/messages`, {
       method: 'POST',
       headers: this.getAuthHeaders(token),
       body: JSON.stringify({ content }),

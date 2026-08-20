@@ -4,6 +4,7 @@ import { ReviewSummary, ReviewFinding, reviewService } from '../../../services/r
 import { ReviewSummaryCard } from './ReviewSummaryCard';
 import { FindingList } from './FindingList';
 import { FindingDetail } from './FindingDetail';
+import { Button } from '../../../components/ui/Button';
 
 export const CodeReviewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -53,63 +54,64 @@ export const CodeReviewPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">AI Code Review</h1>
-        <p className="text-gray-600">Analyze your code using deterministic tools and LLM context to get precise findings.</p>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 16px', fontFamily: 'var(--font-ui)' }}>
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px', fontFamily: 'var(--font-code)' }}>AI_CODE_REVIEW</h1>
+        <p style={{ color: 'var(--color-text-secondary)', fontSize: '13px', fontFamily: 'var(--font-code)' }}>Analyze your code using deterministic tools and LLM context to get precise findings.</p>
       </div>
 
       {!summary && !loading && (
-        <form onSubmit={handleStartReview} className="bg-white p-6 rounded-lg shadow-sm border max-w-3xl">
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">File Name or Context</label>
+        <form onSubmit={handleStartReview} style={{ backgroundColor: 'var(--color-surface)', padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', maxWidth: '800px' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px', fontFamily: 'var(--font-code)' }}>FILE_NAME_OR_CONTEXT</label>
             <input 
               type="text" 
               required
               value={fileOrContext}
               onChange={e => setFileOrContext(e.target.value)}
               placeholder="e.g. src/main/java/AuthService.java"
-              className="w-full border rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+              style={{ width: '100%', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px', color: 'var(--color-text-primary)', fontSize: '12px', fontFamily: 'var(--font-code)', outline: 'none', boxSizing: 'border-box' }}
             />
           </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Code Snippet (Optional)</label>
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px', fontFamily: 'var(--font-code)' }}>CODE_SNIPPET_(OPTIONAL)</label>
             <textarea 
               rows={10}
               value={codeSnippet}
               onChange={e => setCodeSnippet(e.target.value)}
               placeholder="Paste your code here..."
-              className="w-full border rounded-md px-3 py-2 font-mono text-sm focus:ring-indigo-500 focus:border-indigo-500"
+              style={{ width: '100%', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px', color: 'var(--color-text-primary)', fontSize: '12px', fontFamily: 'var(--font-code)', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
             />
           </div>
           
-          {error && <div className="mb-4 text-red-600 bg-red-50 p-3 rounded">{error}</div>}
+          {error && <div style={{ marginBottom: '16px', color: 'var(--color-error)', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '12px', fontFamily: 'var(--font-code)' }}>[ERROR]: {error}</div>}
 
-          <button 
+          <Button 
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded font-medium hover:bg-indigo-700 transition-colors"
+            className="btn-primary"
+            style={{ width: '100%', padding: '10px', fontSize: '12px', fontFamily: 'var(--font-code)' }}
           >
-            Start Review
-          </button>
+            EXECUTE_REVIEW
+          </Button>
         </form>
       )}
 
       {loading && (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
-          <p className="text-gray-600 font-medium animate-pulse">Running static analysis and LLM review...</p>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
+          <div style={{ width: '48px', height: '48px', border: '3px solid var(--color-bg)', borderTopColor: 'var(--color-accent)', borderRadius: '50%', marginBottom: '16px', animation: 'spin 1s linear infinite' }}></div>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '12px', fontFamily: 'var(--font-code)', letterSpacing: '1px' }}>[RUNNING_STATIC_ANALYSIS_AND_LLM_REVIEW...]</p>
         </div>
       )}
 
       {summary && !loading && (
         <div>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Review Results</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }}>REVIEW_RESULTS</h2>
             <button 
               onClick={() => { setSummary(null); setFileOrContext(''); setCodeSnippet(''); }}
-              className="text-indigo-600 hover:text-indigo-800 font-medium"
+              style={{ background: 'transparent', border: 'none', color: 'var(--color-accent)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-code)', padding: 0 }}
             >
-              Start New Review
+              START_NEW_REVIEW
             </button>
           </div>
           
@@ -120,21 +122,21 @@ export const CodeReviewPage: React.FC = () => {
             low={summary.lowCount}
           />
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="col-span-1">
-              <h3 className="font-semibold text-lg mb-3">Findings ({summary.findings.length})</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 2fr)', gap: '32px' }}>
+            <div>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '12px', fontFamily: 'var(--font-code)' }}>FINDINGS ({summary.findings.length})</h3>
               <FindingList 
                 findings={summary.findings} 
                 selectedFindingId={selectedFinding?.id || null}
                 onSelect={setSelectedFinding}
               />
             </div>
-            <div className="col-span-1 lg:col-span-2">
+            <div>
               {selectedFinding ? (
                 <FindingDetail finding={selectedFinding} onUpdateStatus={handleUpdateStatus} />
               ) : (
-                <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-12 text-center text-gray-500">
-                  Select a finding from the list to view details
+                <div style={{ backgroundColor: 'var(--color-bg)', border: '1px dashed var(--color-border)', borderRadius: 'var(--radius-md)', padding: '48px', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '12px', fontFamily: 'var(--font-code)' }}>
+                  [SELECT_A_FINDING_TO_VIEW_DETAILS]
                 </div>
               )}
             </div>

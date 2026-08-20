@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useAnalysisProgress } from '../../../hooks/useAnalysisProgress';
+import { API_BASE_URL } from '../../../services/api';
 
 interface CodeSymbol {
   id: number;
@@ -55,7 +56,7 @@ export function CodeIntelligenceDashboard({ repositoryId }: CodeIntelligenceDash
   const fetchStatus = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${repositoryId}/analysis`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/analysis`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -75,7 +76,7 @@ export function CodeIntelligenceDashboard({ repositoryId }: CodeIntelligenceDash
   const fetchMetrics = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${repositoryId}/metrics`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/metrics`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -90,7 +91,7 @@ export function CodeIntelligenceDashboard({ repositoryId }: CodeIntelligenceDash
   const fetchSymbols = async (type: string = '') => {
     if (!token) return;
     try {
-      const url = `http://localhost:8080/api/repositories/${repositoryId}/symbols${type ? `?type=${type}` : ''}`;
+      const url = `${API_BASE_URL}/api/repositories/${repositoryId}/symbols${type ? `?type=${type}` : ''}`;
       const res = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -106,7 +107,7 @@ export function CodeIntelligenceDashboard({ repositoryId }: CodeIntelligenceDash
   const startAnalysis = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/repositories/${repositoryId}/analyze`, {
+      const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/analyze`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });

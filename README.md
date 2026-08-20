@@ -1,5 +1,8 @@
 # DevPilot
 
+## Live Demo
+https://<actual-vercel-url> (To be updated after deployment)
+
 DevPilot is an advanced AI Engineering Agent and Repository Intelligence platform. It combines deterministic AST (Abstract Syntax Tree) parsing with an autonomous AI agent to help you understand, debug, and refactor codebases safely and efficiently.
 
 ## Features
@@ -25,9 +28,9 @@ graph TD
 ```
 
 ## Tech Stack
-- **Frontend**: React 19, Vite, TypeScript, TailwindCSS, ReactFlow (for graphs).
-- **Backend**: Java 17, Spring Boot 3, Spring Security, JavaParser (AST).
-- **Database**: PostgreSQL 16 with `pgvector` extension.
+- **Frontend**: React 19, Vite, TypeScript, TailwindCSS, ReactFlow (Deployed on **Vercel**).
+- **Backend**: Java 17, Spring Boot 3, Spring Security, JavaParser (Deployed on **Render**).
+- **Database**: PostgreSQL 16 with `pgvector` extension (Hosted on **Neon**).
 - **AI**: Gemini Pro API (via LLM function calling).
 - **Infrastructure**: Docker, Docker Compose, GitHub Actions.
 

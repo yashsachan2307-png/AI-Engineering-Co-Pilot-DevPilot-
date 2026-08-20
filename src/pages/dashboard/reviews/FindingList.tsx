@@ -9,40 +9,55 @@ interface FindingListProps {
 
 export const FindingList: React.FC<FindingListProps> = ({ findings, selectedFindingId, onSelect }) => {
   if (findings.length === 0) {
-    return <div className="text-gray-500 text-center p-4 border rounded">No findings to display.</div>;
+    return <div style={{ color: 'var(--color-text-secondary)', textAlign: 'center', padding: '16px', border: '1px dashed var(--color-border)', borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-code)', fontSize: '12px' }}>[NO_FINDINGS_AVAILABLE]</div>;
   }
 
   const getSeverityColor = (sev: string) => {
     switch(sev) {
-      case 'CRITICAL': return 'bg-red-100 text-red-800';
-      case 'HIGH': return 'bg-orange-100 text-orange-800';
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-blue-100 text-blue-800';
+      case 'CRITICAL': return 'var(--color-error)';
+      case 'HIGH': return 'var(--color-warning)';
+      case 'MEDIUM': return 'var(--color-accent)';
+      default: return 'var(--color-success)';
     }
   };
 
   return (
-    <div className="border rounded-lg divide-y bg-white">
-      {findings.map(finding => (
+    <div style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-surface)', overflow: 'hidden' }}>
+      {findings.map((finding, index) => (
         <div 
           key={finding.id} 
-          className={`p-4 cursor-pointer transition-colors hover:bg-gray-50 ${selectedFindingId === finding.id ? 'bg-indigo-50 border-l-4 border-indigo-500' : 'border-l-4 border-transparent'}`}
+          style={{ 
+            padding: '16px', 
+            cursor: 'pointer', 
+            borderBottom: index < findings.length - 1 ? '1px solid var(--color-border)' : 'none',
+            backgroundColor: selectedFindingId === finding.id ? 'var(--color-bg)' : 'transparent',
+            borderLeft: selectedFindingId === finding.id ? '3px solid var(--color-accent)' : '3px solid transparent'
+          }}
           onClick={() => onSelect(finding)}
         >
-          <div className="flex justify-between items-start mb-2">
-            <h4 className="font-medium text-gray-900 truncate pr-4">{finding.title}</h4>
-            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getSeverityColor(finding.severity)}`}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, paddingRight: '16px', fontFamily: 'var(--font-code)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{finding.title}</h4>
+            <span style={{ 
+              padding: '2px 6px', 
+              fontSize: '10px', 
+              fontWeight: 600, 
+              borderRadius: 'var(--radius-sm)', 
+              backgroundColor: 'var(--color-bg)',
+              color: getSeverityColor(finding.severity),
+              border: `1px solid ${getSeverityColor(finding.severity)}`,
+              fontFamily: 'var(--font-code)'
+            }}>
               {finding.severity}
             </span>
           </div>
-          <div className="flex items-center text-xs text-gray-500 space-x-4">
-            <span className="bg-gray-100 px-2 py-0.5 rounded">{finding.category}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '11px', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-code)' }}>
+            <span style={{ backgroundColor: 'var(--color-bg)', padding: '2px 6px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>{finding.category}</span>
             <span>
               {finding.file} {finding.startLine ? `(L${finding.startLine})` : ''}
             </span>
             {finding.status !== 'PENDING' && (
-              <span className={`font-semibold ${finding.status === 'REVIEWED' ? 'text-green-600' : 'text-gray-400'}`}>
-                {finding.status}
+              <span style={{ fontWeight: 600, color: finding.status === 'REVIEWED' ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
+                [{finding.status}]
               </span>
             )}
           </div>

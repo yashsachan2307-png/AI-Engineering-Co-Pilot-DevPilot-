@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
-import { Terminal } from 'lucide-react';
+import { TerminalSquare } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
 export function Signup() {
@@ -38,24 +38,24 @@ export function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-bg">
-      <div className="panel bg-surface w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6 text-primary hover:text-accent transition-colors">
-            <Terminal size={28} className="text-accent" />
-            <span className="font-bold text-xl tracking-tight">DevPilot</span>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-bg)', padding: '16px', fontFamily: 'var(--font-ui)' }}>
+      <div style={{ backgroundColor: 'var(--color-surface)', width: '100%', maxWidth: '400px', padding: '32px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)' }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '24px', color: 'var(--color-accent)', textDecoration: 'none' }}>
+            <TerminalSquare size={28} />
+            <span style={{ fontWeight: 700, fontSize: '20px', letterSpacing: '0.5px', fontFamily: 'var(--font-code)' }}>DEV_PILOT</span>
           </Link>
-          <h1 className="text-2xl font-bold text-primary mb-2">Create an account</h1>
-          <p className="text-sm text-secondary">Start building better software today</p>
+          <h1 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '8px', fontFamily: 'var(--font-code)' }}>INITIALIZE_ACCOUNT</h1>
+          <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-code)' }}>Start building better software today</p>
         </div>
 
-        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-          {error && <div className="text-error bg-error/10 border border-error/20 p-3 rounded-md text-sm">{error}</div>}
+        <form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }} onSubmit={handleSubmit}>
+          {error && <div style={{ color: 'var(--color-error)', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '12px', borderRadius: 'var(--radius-sm)', fontSize: '12px', fontFamily: 'var(--font-code)' }}>[ERROR]: {error}</div>}
           
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-primary" htmlFor="name">Full Name</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }} htmlFor="name">FULL_NAME</label>
             <input 
-              className="input w-full"
+              style={{ width: '100%', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px', color: 'var(--color-text-primary)', fontSize: '12px', fontFamily: 'var(--font-code)', outline: 'none' }}
               id="name" 
               type="text" 
               placeholder="Jane Doe" 
@@ -65,10 +65,10 @@ export function Signup() {
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-primary" htmlFor="email">Email</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }} htmlFor="email">EMAIL_ADDRESS</label>
             <input 
-              className="input w-full"
+              style={{ width: '100%', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px', color: 'var(--color-text-primary)', fontSize: '12px', fontFamily: 'var(--font-code)', outline: 'none' }}
               id="email" 
               type="email" 
               placeholder="you@example.com" 
@@ -78,10 +78,10 @@ export function Signup() {
             />
           </div>
           
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-primary" htmlFor="password">Password</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }} htmlFor="password">PASSWORD</label>
             <input 
-              className="input w-full"
+              style={{ width: '100%', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px', color: 'var(--color-text-primary)', fontSize: '12px', fontFamily: 'var(--font-code)', outline: 'none' }}
               id="password" 
               type="password" 
               placeholder="••••••••" 
@@ -90,25 +90,25 @@ export function Signup() {
               required 
             />
             {password && (
-              <div className="mt-1">
-                <div className="flex gap-1 mb-1">
-                  <div className={`h-1 flex-1 rounded-sm transition-colors ${strength >= 1 ? 'bg-error' : 'bg-border'}`}></div>
-                  <div className={`h-1 flex-1 rounded-sm transition-colors ${strength >= 2 ? 'bg-warning' : 'bg-border'}`}></div>
-                  <div className={`h-1 flex-1 rounded-sm transition-colors ${strength >= 3 ? 'bg-success' : 'bg-border'}`}></div>
+              <div style={{ marginTop: '4px' }}>
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '4px' }}>
+                  <div style={{ height: '4px', flex: 1, borderRadius: '2px', backgroundColor: strength >= 1 ? 'var(--color-error)' : 'var(--color-border)', transition: 'background-color 0.2s' }}></div>
+                  <div style={{ height: '4px', flex: 1, borderRadius: '2px', backgroundColor: strength >= 2 ? 'var(--color-warning)' : 'var(--color-border)', transition: 'background-color 0.2s' }}></div>
+                  <div style={{ height: '4px', flex: 1, borderRadius: '2px', backgroundColor: strength >= 3 ? 'var(--color-success)' : 'var(--color-border)', transition: 'background-color 0.2s' }}></div>
                 </div>
-                <div className="text-[10px] text-right font-medium">
-                  {strength === 1 && <span className="text-error">Weak</span>}
-                  {strength === 2 && <span className="text-warning">Medium</span>}
-                  {strength === 3 && <span className="text-success">Strong</span>}
+                <div style={{ fontSize: '10px', textAlign: 'right', fontWeight: 600, fontFamily: 'var(--font-code)' }}>
+                  {strength === 1 && <span style={{ color: 'var(--color-error)' }}>WEAK</span>}
+                  {strength === 2 && <span style={{ color: 'var(--color-warning)' }}>MEDIUM</span>}
+                  {strength === 3 && <span style={{ color: 'var(--color-success)' }}>STRONG</span>}
                 </div>
               </div>
             )}
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-primary" htmlFor="confirm">Confirm Password</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }} htmlFor="confirm">CONFIRM_PASSWORD</label>
             <input 
-              className="input w-full"
+              style={{ width: '100%', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '10px 12px', color: 'var(--color-text-primary)', fontSize: '12px', fontFamily: 'var(--font-code)', outline: 'none', boxSizing: 'border-box' }}
               id="confirm" 
               type="password" 
               placeholder="••••••••" 
@@ -118,20 +118,20 @@ export function Signup() {
             />
           </div>
 
-          <div className="mt-2 text-sm">
-            <label className="flex items-start gap-2 cursor-pointer group">
-              <input type="checkbox" className="mt-1 rounded border-border bg-[#0f172a] text-accent focus:ring-accent focus:ring-offset-bg cursor-pointer" required />
-              <span className="text-secondary leading-relaxed group-hover:text-primary transition-colors">
-                I agree to the <a href="#" className="text-accent hover:underline">Terms of Service</a> and <a href="#" className="text-accent hover:underline">Privacy Policy</a>.
+          <div style={{ marginTop: '8px', fontSize: '11px', fontFamily: 'var(--font-code)' }}>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer' }}>
+              <input type="checkbox" style={{ marginTop: '2px', cursor: 'pointer' }} required />
+              <span style={{ color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                I agree to the <a href="#" style={{ color: 'var(--color-accent)', textDecoration: 'none' }}>Terms of Service</a> and <a href="#" style={{ color: 'var(--color-accent)', textDecoration: 'none' }}>Privacy Policy</a>.
               </span>
             </label>
           </div>
 
-          <Button type="submit" className="btn-primary w-full mt-2">Create Account</Button>
+          <Button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '8px', padding: '10px', fontSize: '12px', fontFamily: 'var(--font-code)' }}>CREATE_ACCOUNT</Button>
         </form>
 
-        <p className="text-center mt-8 text-sm text-secondary">
-          Already have an account? <Link to="/login" className="text-accent font-medium hover:underline">Log in</Link>
+        <p style={{ textAlign: 'center', marginTop: '32px', fontSize: '12px', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-code)' }}>
+          Already have an account? <Link to="/login" style={{ color: 'var(--color-accent)', fontWeight: 600, textDecoration: 'none' }}>LOGIN</Link>
         </p>
       </div>
     </div>

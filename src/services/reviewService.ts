@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './api';
+
 export interface ReviewFinding {
   id: number;
   codeReviewId: number;
@@ -44,7 +46,7 @@ export class ReviewService {
   }
 
   async createReview(repositoryId: number | string, fileOrContext: string, codeSnippet: string): Promise<ReviewSummary> {
-    const res = await fetch(`/api/repositories/${repositoryId}/reviews`, {
+    const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/reviews`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ fileOrContext, codeSnippet }),
@@ -54,7 +56,7 @@ export class ReviewService {
   }
 
   async getReviews(repositoryId: number | string): Promise<CodeReview[]> {
-    const res = await fetch(`/api/repositories/${repositoryId}/reviews`, {
+    const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/reviews`, {
       headers: this.getAuthHeaders(),
     });
     if (!res.ok) throw new Error('Failed to fetch reviews');
@@ -62,7 +64,7 @@ export class ReviewService {
   }
 
   async getReviewDetails(repositoryId: number | string, reviewId: number | string): Promise<ReviewSummary> {
-    const res = await fetch(`/api/repositories/${repositoryId}/reviews/${reviewId}`, {
+    const res = await fetch(`${API_BASE_URL}/api/repositories/${repositoryId}/reviews/${reviewId}`, {
       headers: this.getAuthHeaders(),
     });
     if (!res.ok) throw new Error('Failed to fetch review details');
@@ -70,7 +72,7 @@ export class ReviewService {
   }
 
   async updateFindingStatus(findingId: number, status: 'PENDING' | 'REVIEWED' | 'DISMISSED'): Promise<ReviewFinding> {
-    const res = await fetch(`/api/reviews/findings/${findingId}`, {
+    const res = await fetch(`${API_BASE_URL}/api/reviews/findings/${findingId}`, {
       method: 'PATCH',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ status }),

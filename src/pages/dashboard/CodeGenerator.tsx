@@ -11,8 +11,10 @@ import {
   Copy,
   Download,
   FileCode2,
-  Info
+  Info,
+  TerminalSquare
 } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -42,7 +44,7 @@ export function CodeGenerator() {
 
   const fetchRepositories = async () => {
     try {
-      const res = await fetch('/api/repositories', {
+      const res = await fetch(`${API_BASE_URL}/api/repositories`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
@@ -95,78 +97,108 @@ export function CodeGenerator() {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full bg-bg overflow-hidden">
-      <div className="panel border-b-0 border-l-0 border-r-0 rounded-none flex justify-between items-center px-4 py-3 shrink-0 bg-surface">
-        <div>
-          <h1 className="text-sm font-semibold text-primary flex items-center gap-2 m-0">
-            <Code2 size={16} className="text-accent" />
-            Repository-Aware Code Generator
-          </h1>
-          <p className="text-xs text-secondary mt-1 m-0">
-            Propose architecture-aware changes to your codebase.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 px-3 py-1 bg-surface-hover border border-border rounded-sm">
-          <FolderGit2 size={14} className="text-muted" />
-          <select
-            value={selectedRepoId || ''}
-            onChange={(e) => setSelectedRepoId(Number(e.target.value))}
-            className="select text-xs py-0.5 border-none bg-transparent pl-0 focus:ring-0 w-48"
-          >
-            {repositories.length === 0 && <option value="">No repositories imported</option>}
-            {repositories.map(r => (
-              <option key={r.id} value={r.id} className="bg-surface text-primary">
-                {r.fullName || r.name}
-              </option>
-            ))}
-          </select>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', backgroundColor: 'var(--color-bg)' }}>
+      {/* Top Context Bar */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '12px 24px', 
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        flexShrink: 0 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-accent)', fontFamily: 'var(--font-code)', fontSize: '13px' }}>
+            <TerminalSquare size={16} />
+            <span>CODE_GENERATOR_ENGINE</span>
+          </div>
+          
+          <div style={{ height: 16, width: 1, backgroundColor: 'var(--color-border)' }} />
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg)' }}>
+            <FolderGit2 size={12} className="text-muted" />
+            <select
+              value={selectedRepoId || ''}
+              onChange={(e) => setSelectedRepoId(Number(e.target.value))}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--color-text-primary)',
+                fontFamily: 'var(--font-code)',
+                fontSize: '11px',
+                outline: 'none',
+                cursor: 'pointer',
+                width: '180px',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {repositories.length === 0 && <option value="">NO_REPOSITORIES</option>}
+              {repositories.map(r => (
+                <option key={r.id} value={r.id} style={{ background: 'var(--color-surface)' }}>
+                  {r.fullName || r.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-1 gap-4 overflow-hidden">
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left Column: Prompt Input */}
-        <div className="panel w-1/3 flex flex-col shrink-0 bg-surface border-l-0 border-r border-t border-b-0 rounded-none">
-          <div className="px-4 py-3 border-b border-border bg-surface-hover">
-            <h2 className="text-sm font-semibold text-primary m-0">What should we build?</h2>
-            <p className="text-xs text-secondary m-0 mt-0.5">Describe the feature or change.</p>
+        <div style={{ width: '33%', display: 'flex', flexDirection: 'column', flexShrink: 0, backgroundColor: 'var(--color-surface)', borderRight: '1px solid var(--color-border)' }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border)' }}>
+            <h2 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>INSTRUCTION_INPUT</h2>
+            <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0', fontFamily: 'var(--font-ui)' }}>Describe the architecture-aware change to generate.</p>
           </div>
-          <div className="flex flex-col gap-4 p-4 overflow-y-auto">
-            <div className="flex flex-col gap-1.5 flex-1 min-h-[200px]">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: '200px' }}>
               <textarea 
                 value={prompt}
                 onChange={e => setPrompt(e.target.value)}
-                placeholder="e.g. Add an endpoint for updating a user's profile."
-                className="input flex-1 text-xs resize-none"
+                placeholder="e.g. Add a REST endpoint for user profile updates..."
+                style={{
+                  flex: 1,
+                  backgroundColor: 'var(--color-bg)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--color-text-primary)',
+                  fontSize: '13px',
+                  fontFamily: 'var(--font-code)',
+                  padding: '12px',
+                  resize: 'none',
+                  outline: 'none'
+                }}
               />
             </div>
 
             <Button 
-              className="btn-primary w-full justify-center text-xs py-2"
+              className="btn-primary"
+              style={{ width: '100%', justifyContent: 'center', fontFamily: 'var(--font-code)', fontSize: '11px', padding: '12px' }}
               onClick={handleGenerate} 
               disabled={!selectedRepoId || !prompt.trim() || isGenerating}
             >
               {isGenerating ? (
-                <><RefreshCw size={14} className="animate-spin mr-2" /> Analyzing Architecture & Generating...</>
+                <><RefreshCw size={14} className="animate-spin mr-2" /> GENERATING_PROPOSAL...</>
               ) : (
-                <><Code2 size={14} className="mr-2" /> Generate Proposal</>
+                <><Code2 size={14} className="mr-2" /> EXECUTE_GENERATOR</>
               )}
             </Button>
 
             {error && (
-              <div className="p-3 bg-error/10 text-error border border-error/30 rounded text-xs mt-2">
-                {error}
+              <div style={{ padding: '12px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-error)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-sm)', fontSize: '11px', fontFamily: 'var(--font-code)' }}>
+                [ERROR] {error}
               </div>
             )}
             
             {result?.explanation && (
-              <div className="panel border-l-2 border-accent mt-4">
-                <div className="px-3 py-2 border-b border-border bg-surface-hover flex items-center gap-2">
+              <div style={{ borderLeft: '2px solid var(--color-accent)', marginTop: '16px', backgroundColor: 'var(--color-bg)' }}>
+                <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Info size={14} className="text-accent" />
-                  <h3 className="text-xs font-semibold text-primary m-0">Strategy Overview</h3>
+                  <h3 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>STRATEGY_OVERVIEW</h3>
                 </div>
-                <div className="p-3 bg-surface">
-                  <p className="text-xs text-secondary leading-relaxed">
+                <div style={{ padding: '12px' }}>
+                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: '1.6', margin: 0 }}>
                     {result.explanation}
                   </p>
                 </div>
@@ -176,29 +208,29 @@ export function CodeGenerator() {
         </div>
 
         {/* Right Column: Results & Diff Viewer */}
-        <div className="flex-1 overflow-y-auto pr-4 pb-4">
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
           {!result && !isGenerating && (
-            <div className="h-full flex flex-col items-center justify-center text-muted border border-dashed border-border rounded-lg bg-surface/50 min-h-[400px]">
-              <Code2 size={48} className="opacity-30 mb-4" />
-              <p className="text-sm">Submit a request to generate architecture-aware code proposals.</p>
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px dashed var(--color-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-surface)', opacity: 0.8, minHeight: '400px' }}>
+              <Code2 size={48} className="text-muted" style={{ opacity: 0.3, marginBottom: '16px' }} />
+              <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-code)' }}>AWAITING_INSTRUCTION</p>
             </div>
           )}
 
           {isGenerating && (
-            <div className="h-full flex flex-col items-center justify-center min-h-[400px]">
-              <RefreshCw size={32} className="text-accent animate-spin mb-4" />
-              <p className="text-sm font-semibold text-primary">Crafting Proposal...</p>
-              <p className="text-xs text-secondary text-center max-w-sm mt-2">
-                Inspecting controllers, services, DTOs, and repositories to ensure the generated code fits your established patterns.
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+              <RefreshCw size={32} className="text-accent animate-spin" style={{ marginBottom: '16px' }} />
+              <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }}>COMPUTING_AST_MODIFICATIONS...</p>
+              <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', textAlign: 'center', maxWidth: '400px', marginTop: '8px', lineHeight: '1.5', fontFamily: 'var(--font-code)' }}>
+                Analyzing repository structure, resolving dependencies, and synthesizing syntax trees.
               </p>
             </div>
           )}
 
           {result && result.proposals && result.proposals.length > 0 && (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 px-1">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 4px' }}>
                 <FileCode2 size={16} className="text-muted" />
-                <h2 className="text-sm font-semibold text-primary m-0">Proposed File Changes ({result.proposals.length})</h2>
+                <h2 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>PROPOSED_MODIFICATIONS ({result.proposals.length})</h2>
               </div>
               
               {result.proposals.map((proposal, idx) => {
@@ -209,37 +241,43 @@ export function CodeGenerator() {
                 return (
                   <div 
                     key={idx} 
-                    className={`panel overflow-hidden transition-opacity ${isRejected ? 'opacity-60' : ''}`}
                     style={{
-                      borderColor: isApproved ? 'var(--color-success)' : (isRejected ? 'var(--color-error)' : 'var(--color-border)')
+                      border: '1px solid',
+                      borderColor: isApproved ? 'var(--color-success)' : (isRejected ? 'var(--color-error)' : 'var(--color-border)'),
+                      backgroundColor: 'var(--color-surface)',
+                      borderRadius: 'var(--radius-sm)',
+                      overflow: 'hidden',
+                      opacity: isRejected ? 0.6 : 1,
+                      transition: 'opacity 0.2s'
                     }}
                   >
-                    <div className="bg-surface-hover border-b border-border">
-                      <div className="px-4 py-3 flex justify-between items-start gap-4">
-                        <div className="min-w-0 flex-1">
-                          <h3 className="text-sm font-mono text-primary m-0 flex items-center gap-2 truncate">
+                    <div style={{ backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)' }}>
+                      <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <h3 style={{ fontSize: '12px', fontFamily: 'var(--font-code)', color: 'var(--color-text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {proposal.path}
                             {proposal.oldCode ? (
-                              <span className="text-[10px] bg-warning/20 text-warning px-1.5 py-0.5 rounded tracking-wider font-sans">MODIFIED</span>
+                              <span style={{ fontSize: '9px', backgroundColor: 'rgba(234, 179, 8, 0.2)', color: 'var(--color-warning)', padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em' }}>MODIFIED</span>
                             ) : (
-                              <span className="text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded tracking-wider font-sans">NEW</span>
+                              <span style={{ fontSize: '9px', backgroundColor: 'rgba(34, 197, 94, 0.2)', color: 'var(--color-success)', padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.05em' }}>NEW</span>
                             )}
                           </h3>
-                          <p className="text-xs text-secondary mt-1 m-0 truncate">{proposal.explanation}</p>
+                          <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{proposal.explanation}</p>
                         </div>
                         
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <Button className="btn-secondary px-2 py-1 h-7" onClick={() => handleCopy(proposal.newCode)} title="Copy Code">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                          <Button className="btn-secondary" style={{ padding: '4px 8px', height: '28px' }} onClick={() => handleCopy(proposal.newCode)} title="Copy Code">
                             <Copy size={12} />
                           </Button>
-                          <Button className="btn-secondary px-2 py-1 h-7" onClick={() => handleDownloadPatch(proposal)} title="Download Patch">
+                          <Button className="btn-secondary" style={{ padding: '4px 8px', height: '28px' }} onClick={() => handleDownloadPatch(proposal)} title="Download Patch">
                             <Download size={12} />
                           </Button>
                           
-                          <div className="w-px h-4 bg-border mx-1"></div>
+                          <div style={{ width: '1px', height: '16px', backgroundColor: 'var(--color-border)', margin: '0 4px' }} />
                           
                           <Button 
-                            className={`btn-secondary text-[11px] px-2.5 py-1 h-7 ${isApproved ? 'border-success text-success bg-success/10' : ''}`}
+                            className={`btn-secondary ${isApproved ? 'border-success text-success bg-success/10' : ''}`}
+                            style={{ fontSize: '10px', fontFamily: 'var(--font-code)', padding: '4px 10px', height: '28px', backgroundColor: isApproved ? 'rgba(34, 197, 94, 0.1)' : undefined, borderColor: isApproved ? 'var(--color-success)' : undefined, color: isApproved ? 'var(--color-success)' : undefined }}
                             onClick={() => {
                               const newApp = new Set(approvedFiles);
                               newApp.add(proposal.path);
@@ -249,10 +287,11 @@ export function CodeGenerator() {
                               setRejectedFiles(newRej);
                             }}
                           >
-                            <Check size={12} className="mr-1" /> {isApproved ? 'Approved' : 'Approve'}
+                            <Check size={12} style={{ marginRight: '4px' }} /> {isApproved ? 'APPROVED' : 'APPROVE'}
                           </Button>
                           <Button 
-                            className={`btn-secondary text-[11px] px-2.5 py-1 h-7 ${isRejected ? 'border-error text-error bg-error/10' : ''}`}
+                            className={`btn-secondary ${isRejected ? 'border-error text-error bg-error/10' : ''}`}
+                            style={{ fontSize: '10px', fontFamily: 'var(--font-code)', padding: '4px 10px', height: '28px', backgroundColor: isRejected ? 'rgba(239, 68, 68, 0.1)' : undefined, borderColor: isRejected ? 'var(--color-error)' : undefined, color: isRejected ? 'var(--color-error)' : undefined }}
                             onClick={() => {
                               const newRej = new Set(rejectedFiles);
                               newRej.add(proposal.path);
@@ -262,35 +301,39 @@ export function CodeGenerator() {
                               setApprovedFiles(newApp);
                             }}
                           >
-                            <X size={12} className="mr-1" /> {isRejected ? 'Rejected' : 'Reject'}
+                            <X size={12} style={{ marginRight: '4px' }} /> {isRejected ? 'REJECTED' : 'REJECT'}
                           </Button>
                         </div>
                       </div>
                       
                       {/* Tabs */}
                       {proposal.oldCode && (
-                        <div className="flex gap-4 px-4">
+                        <div style={{ display: 'flex', gap: '16px', padding: '0 16px' }}>
                           <button 
                             onClick={() => setActiveTab({...activeTab, [proposal.path]: 'new'})}
-                            className={`text-xs font-semibold pb-2 border-b-2 transition-colors ${currentTab === 'new' ? 'border-accent text-accent' : 'border-transparent text-secondary hover:text-primary'}`}
+                            style={{
+                              fontSize: '11px', fontFamily: 'var(--font-code)', paddingBottom: '8px', backgroundColor: 'transparent', border: 'none', borderBottom: `2px solid ${currentTab === 'new' ? 'var(--color-accent)' : 'transparent'}`, color: currentTab === 'new' ? 'var(--color-accent)' : 'var(--color-text-secondary)', cursor: 'pointer', outline: 'none'
+                            }}
                           >
-                            Proposed Changes
+                            PROPOSED
                           </button>
                           <button 
                             onClick={() => setActiveTab({...activeTab, [proposal.path]: 'old'})}
-                            className={`text-xs font-semibold pb-2 border-b-2 transition-colors ${currentTab === 'old' ? 'border-accent text-accent' : 'border-transparent text-secondary hover:text-primary'}`}
+                            style={{
+                              fontSize: '11px', fontFamily: 'var(--font-code)', paddingBottom: '8px', backgroundColor: 'transparent', border: 'none', borderBottom: `2px solid ${currentTab === 'old' ? 'var(--color-accent)' : 'transparent'}`, color: currentTab === 'old' ? 'var(--color-accent)' : 'var(--color-text-secondary)', cursor: 'pointer', outline: 'none'
+                            }}
                           >
-                            Original Code
+                            ORIGINAL
                           </button>
                         </div>
                       )}
                     </div>
                     
-                    <div className="bg-surface max-h-[500px] overflow-y-auto">
+                    <div style={{ backgroundColor: 'var(--color-bg)', maxHeight: '500px', overflowY: 'auto' }}>
                        <SyntaxHighlighter 
                          language="java" 
                          style={vscDarkPlus} 
-                         customStyle={{ margin: 0, padding: '16px', fontSize: '11px', background: 'transparent' }}
+                         customStyle={{ margin: 0, padding: '16px', fontSize: '11px', fontFamily: 'var(--font-code)', background: 'transparent' }}
                          showLineNumbers={true}
                        >
                          {currentTab === 'old' && proposal.oldCode ? proposal.oldCode : proposal.newCode}

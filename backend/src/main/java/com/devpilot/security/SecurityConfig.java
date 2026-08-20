@@ -74,11 +74,14 @@ public class SecurityConfig {
         return http.build();
     }
     
+    @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins:http://localhost:5173}")
+    private String[] allowedOrigins;
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Adjust for Vite default port
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        // Adjust for Vite default port or Prod URL
+        configuration.setAllowedOrigins(java.util.Arrays.asList(allowedOrigins));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);

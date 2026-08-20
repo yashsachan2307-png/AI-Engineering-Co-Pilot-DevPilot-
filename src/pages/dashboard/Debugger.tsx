@@ -10,8 +10,12 @@ import {
   CheckCircle2,
   FileCode2,
   ShieldAlert,
-  Lightbulb
+  Lightbulb,
+  History,
+  Trash2,
+  TerminalSquare
 } from 'lucide-react';
+import { API_BASE_URL } from '../../services/api';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -40,7 +44,7 @@ export function Debugger() {
 
   const fetchRepositories = async () => {
     try {
-      const res = await fetch('/api/repositories', {
+      const res = await fetch(`${API_BASE_URL}/api/repositories`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
@@ -77,137 +81,187 @@ export function Debugger() {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-full bg-bg overflow-hidden">
-      <div className="panel border-b-0 border-l-0 border-r-0 rounded-none flex justify-between items-center px-4 py-3 shrink-0 bg-surface">
-        <div>
-          <h1 className="text-sm font-semibold text-primary flex items-center gap-2 m-0">
-            <Bug size={16} className="text-accent" />
-            Repository-Aware AI Debugger
-          </h1>
-          <p className="text-xs text-secondary mt-1 m-0">
-            Paste your stack trace and let AI diagnose the root cause using repository context.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 px-3 py-1 bg-surface-hover border border-border rounded-sm">
-          <FolderGit2 size={14} className="text-muted" />
-          <select
-            value={selectedRepoId || ''}
-            onChange={(e) => setSelectedRepoId(Number(e.target.value))}
-            className="select text-xs py-0.5 border-none bg-transparent pl-0 focus:ring-0 w-48"
-          >
-            {repositories.length === 0 && <option value="">No repositories imported</option>}
-            {repositories.map(r => (
-              <option key={r.id} value={r.id} className="bg-surface text-primary">
-                {r.fullName || r.name}
-              </option>
-            ))}
-          </select>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', backgroundColor: 'var(--color-bg)' }}>
+      {/* Top Context Bar */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '12px 24px', 
+        borderBottom: '1px solid var(--color-border)',
+        backgroundColor: 'var(--color-surface)',
+        flexShrink: 0 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-accent)', fontFamily: 'var(--font-code)', fontSize: '13px' }}>
+            <TerminalSquare size={16} />
+            <span>AI_DEBUGGER_ENGINE</span>
+          </div>
+          
+          <div style={{ height: 16, width: 1, backgroundColor: 'var(--color-border)' }} />
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-bg)' }}>
+            <FolderGit2 size={12} className="text-muted" />
+            <select
+              value={selectedRepoId || ''}
+              onChange={(e) => setSelectedRepoId(Number(e.target.value))}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--color-text-primary)',
+                fontFamily: 'var(--font-code)',
+                fontSize: '11px',
+                outline: 'none',
+                cursor: 'pointer',
+                width: '180px',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {repositories.length === 0 && <option value="">NO_REPOSITORIES</option>}
+              {repositories.map(r => (
+                <option key={r.id} value={r.id} style={{ background: 'var(--color-surface)' }}>
+                  {r.fullName || r.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-1 gap-4 overflow-hidden">
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left Column: Inputs */}
-        <div className="panel w-1/2 flex flex-col shrink-0 bg-surface border-l-0 border-r border-t border-b-0 rounded-none">
-          <div className="px-4 py-3 border-b border-border bg-surface-hover">
-            <h2 className="text-sm font-semibold text-primary m-0">Error Details</h2>
-            <p className="text-xs text-secondary m-0 mt-0.5">Provide the error message and stack trace to begin.</p>
+        <div style={{ width: '33%', display: 'flex', flexDirection: 'column', flexShrink: 0, backgroundColor: 'var(--color-surface)', borderRight: '1px solid var(--color-border)' }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid var(--color-border)' }}>
+            <h2 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>ERROR_TELEMETRY</h2>
+            <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '4px 0 0 0', fontFamily: 'var(--font-ui)' }}>Provide the error message and stack trace.</p>
           </div>
-          <div className="flex flex-col gap-4 p-4 overflow-y-auto">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px', overflowY: 'auto' }}>
             
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Error Message (Required)</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-code)' }}>ERROR_MESSAGE (REQUIRED)</label>
               <input 
                 type="text" 
                 value={errorMessage}
                 onChange={e => setErrorMessage(e.target.value)}
                 placeholder="e.g. NullPointerException in UserService.java"
-                className="input text-xs"
+                style={{
+                  backgroundColor: 'var(--color-bg)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--color-text-primary)',
+                  fontSize: '12px',
+                  fontFamily: 'var(--font-code)',
+                  padding: '10px',
+                  outline: 'none'
+                }}
               />
             </div>
 
-            <div className="flex flex-col gap-1.5 flex-1 min-h-[200px]">
-              <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Stack Trace</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1, minHeight: '200px' }}>
+              <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-code)' }}>STACK_TRACE</label>
               <textarea 
                 value={stackTrace}
                 onChange={e => setStackTrace(e.target.value)}
                 placeholder="Paste the full stack trace here..."
-                className="input flex-1 font-mono text-[11px] resize-none whitespace-pre"
+                style={{
+                  flex: 1,
+                  backgroundColor: 'var(--color-bg)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--color-text-primary)',
+                  fontSize: '11px',
+                  fontFamily: 'var(--font-code)',
+                  padding: '10px',
+                  resize: 'none',
+                  outline: 'none',
+                  whiteSpace: 'pre'
+                }}
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-secondary uppercase tracking-wider">Context or Steps to Reproduce (Optional)</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-code)' }}>CONTEXT (OPTIONAL)</label>
               <textarea 
                 value={userDescription}
                 onChange={e => setUserDescription(e.target.value)}
-                placeholder="What were you trying to do when this happened?"
+                placeholder="Steps to reproduce..."
                 rows={3}
-                className="input text-xs resize-none"
+                style={{
+                  backgroundColor: 'var(--color-bg)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--color-text-primary)',
+                  fontSize: '12px',
+                  fontFamily: 'var(--font-code)',
+                  padding: '10px',
+                  resize: 'none',
+                  outline: 'none'
+                }}
               />
             </div>
 
             <Button 
-              className="btn-primary w-full justify-center text-xs py-2 mt-2"
+              className="btn-primary"
+              style={{ width: '100%', justifyContent: 'center', fontFamily: 'var(--font-code)', fontSize: '11px', padding: '12px', marginTop: '8px' }}
               onClick={handleAnalyze} 
               disabled={!selectedRepoId || !errorMessage.trim() || isAnalyzing}
             >
               {isAnalyzing ? (
-                <><RefreshCw size={14} className="animate-spin mr-2" /> Analyzing Repository Context...</>
+                <><RefreshCw size={14} className="animate-spin mr-2" /> ANALYZING_CONTEXT...</>
               ) : (
-                <><Bug size={14} className="mr-2" /> Analyze Error</>
+                <><Bug size={14} className="mr-2" /> EXECUTE_DIAGNOSTIC</>
               )}
             </Button>
 
             {error && (
-              <div className="p-3 bg-error/10 text-error border border-error/30 rounded text-xs mt-2">
-                {error}
+              <div style={{ padding: '12px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-error)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-sm)', fontSize: '11px', fontFamily: 'var(--font-code)', marginTop: '8px' }}>
+                [ERROR] {error}
               </div>
             )}
           </div>
         </div>
 
         {/* Right Column: Results */}
-        <div className="flex-1 overflow-y-auto pr-4 pb-4">
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
           {!result && !isAnalyzing && (
-            <div className="h-full flex flex-col items-center justify-center text-muted border border-dashed border-border rounded-lg bg-surface/50 min-h-[400px]">
-              <Bug size={48} className="opacity-30 mb-4" />
-              <p className="text-sm">Submit an error to view the AI diagnosis here.</p>
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px dashed var(--color-border)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-surface)', opacity: 0.8, minHeight: '400px' }}>
+              <Bug size={48} className="text-muted" style={{ opacity: 0.3, marginBottom: '16px' }} />
+              <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-code)' }}>AWAITING_TELEMETRY</p>
             </div>
           )}
 
           {isAnalyzing && (
-            <div className="h-full flex flex-col items-center justify-center min-h-[400px]">
-              <RefreshCw size={32} className="text-accent animate-spin mb-4" />
-              <p className="text-sm font-semibold text-primary">Gathering Context & Diagnosing...</p>
-              <p className="text-xs text-secondary text-center max-w-sm mt-2">
-                Searching codebase for related files, analyzing stack trace elements, and generating fix recommendations.
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+              <RefreshCw size={32} className="text-accent animate-spin" style={{ marginBottom: '16px' }} />
+              <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', fontFamily: 'var(--font-code)' }}>GATHERING_CONTEXT...</p>
+              <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', textAlign: 'center', maxWidth: '400px', marginTop: '8px', lineHeight: '1.5', fontFamily: 'var(--font-code)' }}>
+                Searching codebase, building syntax tree, analyzing execution flow.
               </p>
             </div>
           )}
 
           {result && (
-            <div className="flex flex-col gap-4">
-              <div className="panel border-l-4 border-error/70">
-                <div className="px-4 py-2.5 border-b border-border bg-error/5 flex items-center gap-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderLeft: '4px solid var(--color-error)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                <div style={{ padding: '8px 16px', backgroundColor: 'rgba(239, 68, 68, 0.05)', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <AlertTriangle size={14} className="text-error" />
-                  <h3 className="text-sm font-semibold text-error m-0">Root Cause Diagnosis</h3>
+                  <h3 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-error)', margin: 0, fontFamily: 'var(--font-code)' }}>ROOT_CAUSE_DIAGNOSIS</h3>
                 </div>
-                <div className="p-4 bg-surface">
-                  <p className="text-sm font-medium text-primary mb-2 leading-relaxed">{result.rootCause}</p>
-                  <p className="text-xs text-secondary leading-relaxed">{result.evidence}</p>
+                <div style={{ padding: '16px' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '8px', lineHeight: '1.6', margin: 0, fontFamily: 'var(--font-code)' }}>{result.rootCause}</p>
+                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: '1.6', margin: '8px 0 0 0', fontFamily: 'var(--font-code)' }}>{result.evidence}</p>
                 </div>
               </div>
 
               {result.suggestedFix && (
-                <div className="panel border-l-4 border-success/70">
-                  <div className="px-4 py-2.5 border-b border-border bg-success/5 flex items-center gap-2">
+                <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderLeft: '4px solid var(--color-success)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                  <div style={{ padding: '8px 16px', backgroundColor: 'rgba(34, 197, 94, 0.05)', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <CheckCircle2 size={14} className="text-success" />
-                    <h3 className="text-sm font-semibold text-success m-0">Suggested Fix</h3>
+                    <h3 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-success)', margin: 0, fontFamily: 'var(--font-code)' }}>SUGGESTED_FIX</h3>
                   </div>
-                  <div className="p-4 bg-surface">
-                    <div className="text-xs rounded overflow-hidden border border-border">
-                      <SyntaxHighlighter language="markdown" style={vscDarkPlus} customStyle={{ margin: 0, fontSize: '11px', padding: '12px' }}>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--color-bg)' }}>
+                    <div style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                      <SyntaxHighlighter language="markdown" style={vscDarkPlus} customStyle={{ margin: 0, fontSize: '11px', fontFamily: 'var(--font-code)', padding: '16px', background: 'transparent' }}>
                         {result.suggestedFix}
                       </SyntaxHighlighter>
                     </div>
@@ -216,15 +270,15 @@ export function Debugger() {
               )}
 
               {result.relevantFiles && result.relevantFiles.length > 0 && (
-                <div className="panel">
-                  <div className="px-4 py-2.5 border-b border-border bg-surface-hover flex items-center gap-2">
+                <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                  <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FileCode2 size={14} className="text-muted" />
-                    <h3 className="text-sm font-semibold text-primary m-0">Relevant Files</h3>
+                    <h3 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>RELEVANT_FILES</h3>
                   </div>
-                  <div className="p-3 bg-surface">
-                    <ul className="m-0 pl-5 text-xs text-secondary font-mono space-y-1">
+                  <div style={{ padding: '12px' }}>
+                    <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--color-text-secondary)', fontSize: '11px', fontFamily: 'var(--font-code)' }}>
                       {result.relevantFiles.map((file, idx) => (
-                        <li key={idx}><code className="text-primary">{file}</code></li>
+                        <li key={idx} style={{ marginBottom: '4px' }}><code style={{ color: 'var(--color-text-primary)' }}>{file}</code></li>
                       ))}
                     </ul>
                   </div>
@@ -232,15 +286,15 @@ export function Debugger() {
               )}
 
               {(result.likelyCauses && result.likelyCauses.length > 0) && (
-                <div className="panel">
-                  <div className="px-4 py-2.5 border-b border-border bg-surface-hover flex items-center gap-2">
+                <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                  <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Lightbulb size={14} className="text-warning" />
-                    <h3 className="text-sm font-semibold text-primary m-0">Possible Causes</h3>
+                    <h3 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>POSSIBLE_CAUSES</h3>
                   </div>
-                  <div className="p-4 bg-surface">
-                    <ul className="m-0 pl-5 text-xs text-secondary space-y-1.5 leading-relaxed">
+                  <div style={{ padding: '16px' }}>
+                    <ul style={{ margin: 0, paddingLeft: '20px', color: 'var(--color-text-secondary)', fontSize: '12px', lineHeight: '1.6' }}>
                       {result.likelyCauses.map((cause, idx) => (
-                        <li key={idx}>{cause}</li>
+                        <li key={idx} style={{ marginBottom: '6px' }}>{cause}</li>
                       ))}
                     </ul>
                   </div>
@@ -248,22 +302,22 @@ export function Debugger() {
               )}
 
               {(result.potentialSideEffects || result.prevention) && (
-                <div className="panel">
-                  <div className="px-4 py-2.5 border-b border-border bg-surface-hover flex items-center gap-2">
+                <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                  <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <ShieldAlert size={14} className="text-accent" />
-                    <h3 className="text-sm font-semibold text-primary m-0">Next Steps</h3>
+                    <h3 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0, fontFamily: 'var(--font-code)' }}>NEXT_STEPS</h3>
                   </div>
-                  <div className="p-4 bg-surface flex flex-col gap-4 text-xs">
+                  <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '12px' }}>
                     {result.potentialSideEffects && (
                       <div>
-                        <strong className="text-primary uppercase tracking-wider text-[10px]">Potential Side Effects</strong>
-                        <p className="text-secondary mt-1 leading-relaxed">{result.potentialSideEffects}</p>
+                        <strong style={{ color: 'var(--color-text-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '10px', fontFamily: 'var(--font-code)' }}>POTENTIAL_SIDE_EFFECTS</strong>
+                        <p style={{ color: 'var(--color-text-secondary)', marginTop: '4px', lineHeight: '1.6', margin: 0 }}>{result.potentialSideEffects}</p>
                       </div>
                     )}
                     {result.prevention && (
                       <div>
-                        <strong className="text-primary uppercase tracking-wider text-[10px]">Prevention</strong>
-                        <p className="text-secondary mt-1 leading-relaxed">{result.prevention}</p>
+                        <strong style={{ color: 'var(--color-text-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '10px', fontFamily: 'var(--font-code)' }}>PREVENTION</strong>
+                        <p style={{ color: 'var(--color-text-secondary)', marginTop: '4px', lineHeight: '1.6', margin: 0 }}>{result.prevention}</p>
                       </div>
                     )}
                   </div>
