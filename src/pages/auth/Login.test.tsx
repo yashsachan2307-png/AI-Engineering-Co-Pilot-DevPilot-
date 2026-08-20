@@ -26,7 +26,7 @@ describe('Login Component', () => {
 
     expect(screen.getByPlaceholderText(/you@example.com/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/••••••••/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Log In/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /LOG_IN/i })).toBeInTheDocument();
   });
 
   it('handles validation errors', async () => {
@@ -36,7 +36,7 @@ describe('Login Component', () => {
       </MemoryRouter>
     );
 
-    const submitBtn = screen.getByRole('button', { name: /Log In/i });
+    const submitBtn = screen.getByRole('button', { name: /LOG_IN/i });
     fireEvent.click(submitBtn);
 
     // Ideally shows validation messages, if handled in the UI
