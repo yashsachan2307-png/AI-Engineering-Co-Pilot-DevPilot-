@@ -36,14 +36,17 @@ public class DevPilotApplication {
                     }
                     
                     System.setProperty("spring.datasource.url", newUrl);
+                    System.setProperty("DATABASE_URL", newUrl);
                     
                     if (uri.getUserInfo() != null) {
                         String[] userInfo = uri.getUserInfo().split(":");
                         if (userInfo.length > 0) {
                             System.setProperty("spring.datasource.username", userInfo[0]);
+                            System.setProperty("DATABASE_USERNAME", userInfo[0]);
                         }
                         if (userInfo.length > 1) {
                             System.setProperty("spring.datasource.password", userInfo[1]);
+                            System.setProperty("DATABASE_PASSWORD", userInfo[1]);
                         }
                     }
                 }
